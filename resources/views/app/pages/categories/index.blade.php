@@ -109,3 +109,145 @@
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        initFlowbite();
+        // --- KONFIGURASI & VARIABEL GLOBAL ---
+        const apiToken = '4|L6VjLfdU3azZWiXfa4ztAmLWak5y4fV2wNt3juWm94cd84a5'; // <<< GANTI TOKEN INI
+        const tableBody = document.querySelector('tbody');
+        const addCategoryModal = document.getElementById('add-category-modal');
+        const modalForm = addCategoryModal.querySelector('form');
+        const modalTitle = addCategoryModal.querySelector('h3');
+        const modalSubmitButton = addCategoryModal.querySelector('button[type="submit"]');
+
+        let editCategoryId = null; // Untuk melacak ID saat mode edit
+
+        // --- FUNGSI-FUNGSI UTAMA ---
+
+        // 1. Fungsi untuk mengambil dan menampilkan semua kategori
+        function fetchCategories() {
+            tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center">Memuat data...</td></tr>';
+            fetch('/api/categories', {
+                headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                tableBody.innerHTML = ''; // Kosongkan tabel
+                if (data.data.length > 0) {
+                    let number = 1;
+                    data.data.forEach(category => {
+                        const row = document.createElement('tr');
+                        row.className = 'hover:bg-gray-100 dark:hover:bg-gray-700';
+                        row.innerHTML = `
+                            <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">${number++}</td>
+                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">${category.name}</td>
+                            <td class="p-4 space-x-2 whitespace-nowrap">
+                                <button type="button" class="edit-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500" data-id="${category.id}">Edit</button>
+                                <button type="button" class="delete-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700" data-id="${category.id}">Hapus</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                } else {
+                    tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center">Tidak ada data kategori.</td></tr>';
+                }
+                attachActionListeners(); // Pasang event listener ke tombol baru
+            })
+            .catch(error => console.error('Error fetching categories:', error));
+        }
+
+        // 2. Fungsi untuk memasang event listener pada tombol Edit dan Hapus
+        function attachActionListeners() {
+            // Event listener untuk tombol Edit
+            document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    editCategoryId = this.dataset.id;
+                    // Ambil data kategori spesifik dari API
+                    fetch(`/api/categories/${editCategoryId}`, {
+                        headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        // Isi form dengan data yang ada
+                        modalForm.querySelector('#name').value = data.data.name;
+                        // Ubah judul dan teks tombol modal
+                        modalTitle.textContent = 'Edit Kategori';
+                        modalSubmitButton.textContent = 'Simpan Perubahan';
+                        // Tampilkan modal (menggunakan toggle dari Flowbite)
+                        new Flowbite.Modal(addCategoryModal).show();
+                    });
+                });
+            });
+
+            // Event listener untuk tombol Hapus
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const categoryId = this.dataset.id;
+                    if (confirm('Anda yakin ingin menghapus kategori ini?')) {
+                        fetch(`/api/categories/${categoryId}`, {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                alert('Kategori berhasil dihapus.');
+                                fetchCategories(); // Refresh tabel
+                            } else {
+                                alert('Gagal menghapus kategori.');
+                            }
+                        });
+                    }
+                });
+            });
+        }
+
+        // --- EVENT LISTENERS ---
+
+        // Event listener untuk tombol "Tambah Kategori"
+        document.querySelector('[data-modal-toggle="add-category-modal"]').addEventListener('click', function() {
+            editCategoryId = null; // Mode "tambah", bukan "edit"
+            modalForm.reset(); // Kosongkan form
+            modalTitle.textContent = 'Tambah Kategori Baru';
+            modalSubmitButton.textContent = 'Simpan';
+        });
+
+        // Event listener untuk form submission di dalam modal
+        modalForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(modalForm);
+            const data = Object.fromEntries(formData.entries());
+            
+            const method = editCategoryId ? 'PUT' : 'POST';
+            const url = editCategoryId ? `/api/categories/${editCategoryId}` : '/api/categories';
+            
+            fetch(url, {
+                method: method,
+                headers: {
+                    'Authorization': `Bearer ${apiToken}`,
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.errors) {
+                    let errorMessages = Object.values(result.errors).map(error => error[0]).join('\n');
+                    alert(`Gagal menyimpan:\n${errorMessages}`);
+                } else {
+                    alert('Data kategori berhasil disimpan.');
+                    new Flowbite.Modal(addCategoryModal).hide(); // Sembunyikan modal
+                    fetchCategories(); // Refresh tabel
+                }
+            })
+            .catch(error => console.error('Error submitting form:', error));
+        });
+
+        // --- INISIALISASI ---
+        fetchCategories(); // Panggil fungsi utama saat halaman dimuat
+    });
+</script>
+@endpush

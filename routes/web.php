@@ -32,6 +32,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('app.pages.categories.index');
     })->name('admin.categories.index');
 
+    Route::get('/categories/create', function () {
+        return view('app.pages.categories.create');
+    })->name('admin.categories.create');
+
     // Rute Manajemen Supplier
     Route::get('/suppliers', function () {
         return view('app.pages.suppliers.index');
