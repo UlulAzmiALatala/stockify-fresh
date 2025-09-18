@@ -12,7 +12,15 @@ use Illuminate\Support\Facades\Route;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::name('index-practice')->get('/', function () {
+    return view('pages.practice.index');
+});
 
-Route::get('/', function () {
-    return view('welcome');
+Route::name('practice.')->group(function () {
+    Route::name('first')->get('practice/1', function () {
+        return view('pages.practice.1');
+    });
+    Route::name('second')->get('practice/2', function () {
+        return view('pages.practice.2');
+    });
 });
