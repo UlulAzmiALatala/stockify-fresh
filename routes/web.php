@@ -66,4 +66,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 // Memuat rute-rute autentikasi dari Breeze
+// require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/auth.php';
