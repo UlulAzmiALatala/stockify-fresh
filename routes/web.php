@@ -7,20 +7,15 @@ use Illuminate\Support\Facades\Route;
 | Web Routes
 |--------------------------------------------------------------------------
 |
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
+| Di sini kita akan mendaftarkan semua rute untuk antarmuka web aplikasi Stockify.
 |
 */
-Route::name('index-practice')->get('/', function () {
-    return view('pages.practice.index');
+
+Route::get('/', function () {
+    // Mengarahkan halaman utama ke view dashboard aplikasi Anda
+    // Berdasarkan struktur folder views baru Anda
+    return view('app.pages.dashboard');
 });
 
-Route::name('practice.')->group(function () {
-    Route::name('first')->get('practice/1', function () {
-        return view('pages.practice.1');
-    });
-    Route::name('second')->get('practice/2', function () {
-        return view('pages.practice.2');
-    });
-});
+// Anda bisa menambahkan rute web lain di sini nanti
+// Contoh: Route::get('/profile', [ProfileController::class, 'show']);
