@@ -9,9 +9,9 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Halaman utama akan mengarahkan ke halaman login jika belum terautentikasi
+// Halaman utama akan menampilkan halaman login
 Route::get('/', function () {
-    return view('auth.sign-in'); // Menggunakan view login dari template Anda
+    return view('auth.sign-in');
 });
 
 // Grup rute untuk semua halaman aplikasi yang memerlukan login
@@ -20,7 +20,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Rute Dashboard Utama
     Route::get('/dashboard', function () {
         return view('app.pages.dashboard');
-    })->name('dashboard'); // Nama default dari Breeze, bisa juga 'admin.dashboard'
+    })->name('admin.dashboard'); // MODIFIKASI: Diubah agar sesuai dengan template
 
     // Rute Manajemen Produk
     Route::get('/products', function () {
@@ -61,5 +61,5 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Memuat rute-rute autentikasi (login, register, dll.) dari Breeze
+// Memuat rute-rute autentikasi dari Breeze
 require __DIR__ . '/auth.php';
