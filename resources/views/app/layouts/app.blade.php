@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard') - Stockify</title>
+    
+    {{-- Meta tag untuk keamanan form (PENTING UNTUK JAVASCRIPT) --}}
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
@@ -14,21 +17,23 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900">
 
-    {{-- Memanggil komponen Navbar --}}
+    {{-- Navbar dipanggil di sini --}}
     @include('app.components.navbar')
 
+    {{-- Pembungkus utama untuk sidebar dan konten --}}
     <div class="flex pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
         
-        {{-- Memanggil komponen Sidebar --}}
+        {{-- Sidebar dipanggil di sini --}}
         @include('app.components.sidebar')
 
+        {{-- Area Konten Utama --}}
         <div id="main-content" class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900">
             <main>
-                {{-- Di sinilah konten utama dari setiap halaman akan ditampilkan --}}
+                {{-- Konten dari setiap halaman akan muncul di sini --}}
                 @yield('content')
             </main>
             
-            {{-- Memanggil komponen Footer --}}
+            {{-- Footer dipanggil di dalam area konten --}}
             @include('app.components.footer')
         </div>
 
