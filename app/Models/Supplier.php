@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Supplier extends Model
 {
@@ -20,4 +21,13 @@ class Supplier extends Model
         'phone',
         'email',
     ];
+
+    /**
+     * Mendefinisikan relasi "one-to-many" ke model Product.
+     * Satu Supplier bisa memasok banyak Produk.
+     */
+    public function products(): HasMany
+    {
+        return $this->hasMany(Product::class);
+    }
 }
