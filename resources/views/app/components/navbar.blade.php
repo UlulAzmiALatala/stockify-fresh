@@ -7,8 +7,7 @@
                     <span class="sr-only">Open sidebar</span>
                     <i class="fa-solid fa-bars w-6 h-6"></i>
                 </button>
-                <a href="{{ route('admin.dashboard') }}" class="flex items-center ms-2 md:me-24">
-                    <img src="{{ asset('images/stockify.png') }}" class="h-12  me-3" alt="Stockify Logo" />
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center ms-2 md:me-24">   
                     <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Stockify</span>
                 </a>
             </div>

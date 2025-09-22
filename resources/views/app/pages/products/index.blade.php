@@ -1,219 +1,351 @@
-@extends('app.layouts.app')
-
-@section('title', 'Manajemen Produk')
-
-@section('content')
-
-{{-- Header Halaman --}}
-<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
-    <div class="w-full mb-1">
-        <div class="mb-4">
-            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Manajemen Produk</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Kelola semua produk, termasuk stok, harga, dan atribut lainnya.</p>
-        </div>
-        <div class="sm:flex">
-            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                    <i class="w-5 h-5 mr-2 -ml-1 fa-solid fa-plus"></i>
-                    Tambah Produk
-                </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-{{-- Konten Tabel --}}
-<div class="flex flex-col">
-    <div class="overflow-x-auto">
-        <div class="inline-block min-w-full align-middle">
-            <div class="overflow-hidden shadow">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
-                    <thead class="bg-gray-100 dark:bg-gray-700">
-                        <tr>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">Nama Produk</th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">Kategori</th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">Harga Jual</th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">Stok</th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody id="product-table-body" class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                        {{-- Data Dummy Baris 1 --}}
-                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">Laptop ProBook 14"</td>
-                            <td class="p-4 text-sm font-normal text-gray-500 dark:text-gray-400">Elektronik</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 dark:text-white">Rp 12.500.000</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 dark:text-white">50</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                {{-- Tombol Edit dengan data attributes untuk di-tangkap JavaScript --}}
-                                <button type="button" 
-                                    class="edit-button inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500"
-                                    data-modal-target="edit-product-modal" 
-                                    data-modal-toggle="edit-product-modal"
-                                    data-id="1"
-                                    data-name="Laptop ProBook 14&quot;"
-                                    data-sku="LP-PB-14-001"
-                                    data-category="elektronik"
-                                    data-supplier="supplier2"
-                                    data-purchase_price="10000000"
-                                    data-selling_price="12500000"
-                                    data-description="Deskripsi singkat laptop ProBook.">
-                                    Edit
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Management Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <!-- Start block -->
+    <section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
+        <div class="mx-auto max-w-screen-2xl px-4 lg:px-12">
+            <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
+                    <div class="flex-1 flex items-center space-x-2">
+                        <h5>
+                            <span class="text-gray-500">All Products:</span>
+                            <span class="dark:text-white" id="product-count">3</span>
+                        </h5>
+                        <button type="button" class="group" data-tooltip-target="products-tooltip">
+                            <i class="fa-solid fa-circle-info text-gray-400"></i>
+                            <span class="sr-only">More info</span>
+                        </button>
+                        <div id="products-tooltip" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+                            Shows all available products in the inventory
+                            <div class="tooltip-arrow" data-popper-arrow></div>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex items-center space-x-2">
+                        <div class="relative w-full md:w-auto flex-1">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <i class="fa-solid fa-magnifying-glass text-gray-400"></i>
+                            </div>
+                            <input type="text" id="search-products" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Search products">
+                        </div>
+                        <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
+                            <button type="button" id="createProductModalButton" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                                <i class="fa-solid fa-plus mr-2"></i>
+                                Add Product
+                            </button>
+                            <div class="flex items-center space-x-3 w-full md:w-auto">
+                                <button id="filterDropdownButton" class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 focus:z-10 focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" type="button">
+                                    <i class="fa-solid fa-filter mr-2"></i>
+                                    Filter
+                                    <svg class="-mr-1 ml-1.5 w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                        <path clip-rule="evenodd" fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"></path>
+                                    </svg>
                                 </button>
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700">Hapus</button>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-{{-- ======================== MODAL TAMBAH PRODUK (BARU) ======================== --}}
-<div id="add-product-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
-    <div class="relative w-full h-full max-w-4xl p-4 md:h-auto">
-        <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b rounded-t sm:mb-5 dark:border-gray-600">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Tambah Produk Baru</h3>
-                <button type="button" id="close-add-modal" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="add-product-modal">
-                    <i class="fa-solid fa-times w-5 h-5"></i>
-                </button>
-            </div>
-            <form id="add-product-form" action="#">
-                <div class="grid gap-4 mb-4 grid-cols-1 sm:grid-cols-2">
-                    <div>
-                        <label for="add-name" class="block mb-2 text-sm font-medium">Nama Produk</label>
-                        <input type="text" id="add-name" name="name" class="bg-gray-50 border ... w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="add-sku" class="block mb-2 text-sm font-medium">SKU</label>
-                        <input type="text" id="add-sku" name="sku" class="bg-gray-50 border ... w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="add-category" class="block mb-2 text-sm font-medium">Kategori</label>
-                        <select id="add-category" name="category_id" class="bg-gray-50 border ... w-full p-2.5"></select>
-                    </div>
-                    <div>
-                        <label for="add-supplier" class="block mb-2 text-sm font-medium">Supplier</label>
-                        <select id="add-supplier" name="supplier_id" class="bg-gray-50 border ... w-full p-2.5"></select>
-                    </div>
-                    <div>
-                        <label for="add-purchase_price" class="block mb-2 text-sm font-medium">Harga Beli</label>
-                        <input type="number" id="add-purchase_price" name="purchase_price" class="bg-gray-50 border ... w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="add-selling_price" class="block mb-2 text-sm font-medium">Harga Jual</label>
-                        <input type="number" id="add-selling_price" name="selling_price" class="bg-gray-50 border ... w-full p-2.5" required>
-                    </div>
-                     <div class="sm:col-span-2">
-                        <label for="add-description" class="block mb-2 text-sm font-medium">Deskripsi</label>
-                        <textarea id="add-description" name="description" rows="4" class="block p-2.5 w-full ..."></textarea>
+                                <div id="filterDropdown" class="z-10 hidden w-48 p-3 bg-white rounded-lg shadow dark:bg-gray-700">
+                                    <h6 class="mb-3 text-sm font-medium text-gray-900 dark:text-white">Category</h6>
+                                    <ul class="space-y-2 text-sm" aria-labelledby="filterDropdownButton">
+                                        <li class="flex items-center">
+                                            <input id="all-categories" type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500" checked>
+                                            <label for="all-categories" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">All</label>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <input id="desktop-pc" type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="desktop-pc" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">Desktop PC</label>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <input id="laptop" type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="laptop" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">Laptop</label>
+                                        </li>
+                                        <li class="flex items-center">
+                                            <input id="audio" type="checkbox" value="" class="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500">
+                                            <label for="audio" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-100">Audio</label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button type="submit" class="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 ...">
-                    Simpan Produk
-                </button>
-            </form>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th scope="col" class="p-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-all" type="checkbox" class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-all" class="sr-only">checkbox</label>
+                                    </div>
+                                </th>
+                                <th scope="col" class="p-4">Product</th>
+                                <th scope="col" class="p-4">Category</th>
+                                <th scope="col" class="p-4">Stock</th>
+                                <th scope="col" class="p-4">Sales</th>
+                                <th scope="col" class="p-4">Revenue</th>
+                                <th scope="col" class="p-4">Last Update</th>
+                                <th scope="col" class="p-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="p-4 w-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-table-search-1" type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-table-search-1" class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center mr-3">
+                                        <img src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/imac-front-image.png" alt="iMac Front Image" class="h-8 w-auto mr-3">
+                                        Apple iMac 27"
+                                    </div>
+                                </th>
+                                <td class="px-4 py-3">
+                                    <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">Desktop PC</span>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        <div class="h-4 w-4 rounded-full inline-block mr-2 bg-red-700"></div>
+                                        95
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">32</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">$2,990</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">Apr 22, 2023</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center space-x-4">
+                                        <button type="button" data-drawer-target="drawer-read-product-advanced" data-drawer-show="drawer-read-product-advanced" aria-controls="drawer-read-product-advanced" class="text-primary-600 hover:text-primary-900 dark:text-primary-500 dark:hover:text-primary-700">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button type="button" data-drawer-target="drawer-update-product" data-drawer-show="drawer-update-product" aria-controls="drawer-update-product" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button type="button" data-modal-target="delete-modal" data-modal-toggle="delete-modal" class="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-700">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="p-4 w-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-table-search-2" type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-table-search-2" class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center mr-3">
+                                        <img src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/macbook-pro.png" alt="MacBook Pro Image" class="h-8 w-auto mr-3">
+                                        MacBook Pro 16"
+                                    </div>
+                                </th>
+                                <td class="px-4 py-3">
+                                    <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">Laptop</span>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        <div class="h-4 w-4 rounded-full inline-block mr-2 bg-green-700"></div>
+                                        50
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">45</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">$6,750</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">Mar 5, 2023</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center space-x-4">
+                                        <button type="button" data-drawer-target="drawer-read-product-advanced" data-drawer-show="drawer-read-product-advanced" aria-controls="drawer-read-product-advanced" class="text-primary-600 hover:text-primary-900 dark:text-primary-500 dark:hover:text-primary-700">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button type="button" data-drawer-target="drawer-update-product" data-drawer-show="drawer-update-product" aria-controls="drawer-update-product" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button type="button" data-modal-target="delete-modal" data-modal-toggle="delete-modal" class="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-700">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
+                                <td class="p-4 w-4">
+                                    <div class="flex items-center">
+                                        <input id="checkbox-table-search-3" type="checkbox" onclick="event.stopPropagation()" class="w-4 h-4 text-primary-600 bg-gray-100 rounded border-gray-300 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600">
+                                        <label for="checkbox-table-search-3" class="sr-only">checkbox</label>
+                                    </div>
+                                </td>
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center mr-3">
+                                        <img src="https://flowbite.s3.amazonaws.com/blocks/application-ui/products/sony-headphones.png" alt="Sony Headphones Image" class="h-8 w-auto mr-3">
+                                        Sony WH-1000XM4
+                                    </div>
+                                </th>
+                                <td class="px-4 py-3">
+                                    <span class="bg-primary-100 text-primary-800 text-xs font-medium px-2 py-0.5 rounded dark:bg-primary-900 dark:text-primary-300">Audio</span>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center">
+                                        <div class="h-4 w-4 rounded-full inline-block mr-2 bg-yellow-700"></div>
+                                        180
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">120</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">$8,500</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">Feb 28, 2023</td>
+                                <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                                    <div class="flex items-center space-x-4">
+                                        <button type="button" data-drawer-target="drawer-read-product-advanced" data-drawer-show="drawer-read-product-advanced" aria-controls="drawer-read-product-advanced" class="text-primary-600 hover:text-primary-900 dark:text-primary-500 dark:hover:text-primary-700">
+                                            <i class="fa-solid fa-eye"></i>
+                                        </button>
+                                        <button type="button" data-drawer-target="drawer-update-product" data-drawer-show="drawer-update-product" aria-controls="drawer-update-product" class="text-blue-600 hover:text-blue-900 dark:text-blue-500 dark:hover:text-blue-700">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
+                                        <button type="button" data-modal-target="delete-modal" data-modal-toggle="delete-modal" class="text-red-600 hover:text-red-900 dark:text-red-500 dark:hover:text-red-700">
+                                            <i class="fa-solid fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+                    <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+                        Showing
+                        <span class="font-semibold text-gray-900 dark:text-white">1-3</span>
+                        of
+                        <span class="font-semibold text-gray-900 dark:text-white">3</span>
+                    </span>
+                    <ul class="inline-flex items-stretch -space-x-px">
+                        <li>
+                            <a href="#" class="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <span class="sr-only">Previous</span>
+                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center justify-center text-sm py-2 px-3 leading-tight text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">1</a>
+                        </li>
+                        <li>
+                            <a href="#" class="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <span class="sr-only">Next</span>
+                                <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
+                                </svg>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
-    </div>
-</div>
+    </section>
 
-
-
-{{-- ======================== MODAL EDIT PRODUK (BARU) ======================== --}}
-<div id="edit-product-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
-    <div class="relative w-full h-full max-w-4xl p-4 md:h-auto">
-        <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b rounded-t sm:mb-5 dark:border-gray-600">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Edit Produk</h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center" data-modal-toggle="edit-product-modal">
-                    <i class="fa-solid fa-times w-5 h-5"></i>
+    <!-- Delete Modal -->
+    <div id="delete-modal" tabindex="-1" class="fixed top-0 left-0 right-0 z-50 hidden p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+        <div class="relative w-full max-w-md max-h-full">
+            <div class="relative bg-white rounded-lg shadow dark:bg-gray-700">
+                <button type="button" class="absolute top-3 right-2.5 text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-800 dark:hover:text-white" data-modal-hide="delete-modal">
+                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
                     <span class="sr-only">Close modal</span>
                 </button>
-            </div>
-            <form action="#">
-                {{-- Input tersembunyi untuk menyimpan ID produk yang akan di-update --}}
-                <input type="hidden" id="edit-product-id" name="id">
-                
-                <div class="grid gap-4 mb-4 sm:grid-cols-2">
-                    <div>
-                        <label for="edit-name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Produk</label>
-                        <input type="text" name="name" id="edit-name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="edit-sku" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">SKU</label>
-                        <input type="text" name="sku" id="edit-sku" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="edit-category" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Kategori</label>
-                        <select id="edit-category" name="category" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                            <option value="elektronik">Elektronik</option>
-                            <option value="pakaian">Pakaian</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="edit-supplier" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Supplier</label>
-                        <select id="edit-supplier" name="supplier" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
-                            <option value="supplier1">PT. Sejahtera Abadi</option>
-                            <option value="supplier2">CV. Maju Jaya Elektronik</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label for="edit-purchase_price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Harga Beli</label>
-                        <input type="number" name="purchase_price" id="edit-purchase_price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                    </div>
-                    <div>
-                        <label for="edit-selling_price" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Harga Jual</label>
-                        <input type="number" name="selling_price" id="edit-selling_price" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5" required>
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label for="edit-description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Deskripsi</label>
-                        <textarea id="edit-description" rows="4" class="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300"></textarea>
-                    </div>
+                <div class="p-6 text-center">
+                    <svg aria-hidden="true" class="mx-auto mb-4 text-gray-400 w-14 h-14 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <h3 class="mb-5 text-lg font-normal text-gray-500 dark:text-gray-400">Are you sure you want to delete this product?</h3>
+                    <button data-modal-hide="delete-modal" type="button" class="text-white bg-red-600 hover:bg-red-800 focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 font-medium rounded-lg text-sm inline-flex items-center px-5 py-2.5 text-center mr-2">
+                        Yes, I'm sure
+                    </button>
+                    <button data-modal-hide="delete-modal" type="button" class="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-gray-200 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">No, cancel</button>
                 </div>
-                <button type="submit" class="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
-                    Update Produk
-                </button>
-            </form>
+            </div>
         </div>
     </div>
-</div>
 
-@endsection
-
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Event listener untuk semua tombol edit di dalam tabel
-        const tableBody = document.getElementById('product-table-body');
+    <script>
+        // Toggle dark mode
+        const themeToggle = document.querySelectorAll('#theme-toggle');
         
-        tableBody.addEventListener('click', function(event) {
-            // Cek apakah yang diklik adalah tombol dengan class 'edit-button'
-            const editButton = event.target.closest('.edit-button');
-            if (editButton) {
-                // 1. Dapatkan semua data dari atribut 'data-*' pada tombol
-                const id = editButton.dataset.id;
-                const name = editButton.dataset.name;
-                const sku = editButton.dataset.sku;
-                const category = editButton.dataset.category;
-                const supplier = editButton.dataset.supplier;
-                const purchasePrice = editButton.dataset.purchase_price;
-                const sellingPrice = editButton.dataset.selling_price;
-                const description = editButton.dataset.description;
+        themeToggle.forEach(button => {
+            button.addEventListener('click', () => {
+                document.documentElement.classList.toggle('dark');
+                const isDark = document.documentElement.classList.contains('dark');
+                localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            });
+        });
 
-                // 2. Isi form di dalam modal edit dengan data tersebut
-                document.getElementById('edit-product-id').value = id;
-                document.getElementById('edit-name').value = name;
-                document.getElementById('edit-sku').value = sku;
-                document.getElementById('edit-category').value = category;
-                document.getElementById('edit-supplier').value = supplier;
-                document.getElementById('edit-purchase_price').value = purchasePrice;
-                document.getElementById('edit-selling_price').value = sellingPrice;
-                document.getElementById('edit-description').value = description;
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Filter dropdown functionality
+        const filterButton = document.getElementById('filterDropdownButton');
+        const filterDropdown = document.getElementById('filterDropdown');
+
+        filterButton.addEventListener('click', function() {
+            filterDropdown.classList.toggle('hidden');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            if (!filterButton.contains(event.target) && !filterDropdown.contains(event.target)) {
+                filterDropdown.classList.add('hidden');
             }
         });
-    });
-</script>
-@endpush
+
+        // Search functionality
+        const searchInput = document.getElementById('search-products');
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        searchInput.addEventListener('input', function() {
+            const searchValue = this.value.toLowerCase();
+            
+            tableRows.forEach(row => {
+                const productName = row.querySelector('th').textContent.toLowerCase();
+                if (productName.includes(searchValue)) {
+                    row.classList.remove('hidden');
+                } else {
+                    row.classList.add('hidden');
+                }
+            });
+        });
+
+        // Select all checkbox functionality
+        const selectAllCheckbox = document.getElementById('checkbox-all');
+        const itemCheckboxes = document.querySelectorAll('tbody input[type="checkbox"]');
+        
+        selectAllCheckbox.addEventListener('change', function() {
+            itemCheckboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+    </script>
+</body>
+</html>
