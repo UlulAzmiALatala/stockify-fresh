@@ -29,6 +29,19 @@ class CategoryController extends Controller
     }
 
     /**
+     * Menampilkan halaman detail untuk kategori spesifik.
+     */
+    public function show(Category $category)
+    {
+        // Eager load relasi products beserta relasi supplier di dalamnya
+        // Ini akan mencegah N+1 query problem di halaman detail
+        $category->load('products.supplier');
+
+        return view('app.pages.categories.show', compact('category'));
+    }
+
+
+    /**
      * Menyimpan kategori baru ke dalam database.
      */
     public function store(Request $request)

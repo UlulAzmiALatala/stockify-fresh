@@ -7,247 +7,132 @@
 {{-- Ini adalah bagian konten yang akan dimasukkan ke @yield('content') di layout utama --}}
 @section('content')
 
-{{-- Header Halaman --}}
-<div class="p-4 bg-white block sm:flex items-center justify-between border-b border-gray-200 lg:mt-1.5 dark:bg-gray-800 dark:border-gray-700">
-    <div class="w-full mb-1">
-        <div class="mb-4">
-            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">Manajemen Kategori Produk</h1>
-            <p class="text-sm text-gray-500 dark:text-gray-400">Kelola semua kategori produk yang tersedia di sistem.</p>
-        </div>
-        <div class="sm:flex">
-            <div class="flex items-center ml-auto space-x-2 sm:space-x-3">
-                <button type="button" data-modal-target="add-category-modal" data-modal-toggle="add-category-modal" class="inline-flex items-center justify-center w-1/2 px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 sm:w-auto dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                    <svg class="w-5 h-5 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                    Tambah Kategori
-                </button>
+<section class="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 antialiased">
+    <div class="mx-auto max-w-screen-2xl px-4 lg:px-12">
+        {{-- Menampilkan notifikasi sukses atau error di bagian atas --}}
+        @if(session('success'))
+            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                <span class="font-medium">Sukses!</span> {{ session('success') }}
             </div>
-        </div>
-    </div>
-</div>
+        @endif
+         @if(session('error'))
+            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <span class="font-medium">Gagal!</span> {{ session('error') }}
+            </div>
+        @endif
 
-{{-- Konten Tabel --}}
-<div class="flex flex-col">
-    <div class="overflow-x-auto">
-        <div class="inline-block min-w-full align-middle">
-            <div class="overflow-hidden shadow">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed dark:divide-gray-600">
-                    <thead class="bg-gray-100 dark:bg-gray-700">
+        {{-- Komponen Kartu Utama --}}
+        {{-- CATATAN: overflow-hidden dihapus dari sini agar dropdown aksi tidak terpotong --}}
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
+
+            {{-- Header Kartu: Judul, Cari, dan Tombol Tambah --}}
+            <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4 border-b dark:border-gray-700">
+                <div class="w-full md:w-1/2">
+                     <h5 class="text-lg font-semibold text-gray-900 dark:text-white">
+                        Daftar Kategori
+                        <span class="text-gray-500">({{ $categories->total() }})</span>
+                    </h5>
+                </div>
+                <div class="w-full md:w-1/2 flex justify-end items-center space-x-3">
+                    <form action="{{ route('categories.index') }}" method="GET" class="w-full max-w-sm">
+                        <label for="search" class="sr-only">Cari</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                                <svg aria-hidden="true" class="w-5 h-5 text-gray-500 dark:text-gray-400" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <input type="text" name="search" id="search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Cari kategori" value="{{ request('search') }}">
+                        </div>
+                    </form>
+                    <button type="button" data-modal-target="add-category-modal" data-modal-toggle="add-category-modal" class="flex-shrink-0 flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2.5 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                        <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
+                        </svg>
+                        Tambah Kategori
+                    </button>
+                </div>
+            </div>
+
+            {{-- Konten Tabel --}}
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+                    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-                                No
-                            </th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-                                Nama Kategori
-                            </th>
-                            <th scope="col" class="p-4 text-xs font-medium text-left text-gray-500 uppercase dark:text-gray-400">
-                                Aksi
-                            </th>
+                            <th scope="col" class="px-4 py-3">No</th>
+                            <th scope="col" class="px-4 py-3">Nama Kategori</th>
+                            <th scope="col" class="px-4 py-3">Deskripsi</th>
+                            <th scope="col" class="px-4 py-3">Jumlah Produk</th>
+                            <th scope="col" class="px-4 py-3 text-center">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-                        {{-- Data Dummy Baris 1 (Contoh) --}}
-                        <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">1</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">Elektronik</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300">Edit</button>
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-900">Hapus</button>
-                            </td>
-                        </tr>
-                        {{-- Data Dummy Baris 2 (Contoh) --}}
-                         <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">2</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">Pakaian</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300">Edit</button>
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-900">Hapus</button>
-                            </td>
-                        </tr>
-                         {{-- Data Dummy Baris 3 (Contoh) --}}
-                         <tr class="hover:bg-gray-100 dark:hover:bg-gray-700">
-                            <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">3</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">Makanan Ringan</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300">Edit</button>
-                                <button type="button" class="inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700 focus:ring-4 focus:ring-red-900">Hapus</button>
-                            </td>
-                        </tr>
+                    <tbody>
+                        @forelse ($categories as $category)
+                            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                                <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ ($categories->currentPage() - 1) * $categories->perPage() + $loop->iteration }}</th>
+                                <td class="px-4 py-3 font-semibold">{{ $category->name }}</td>
+                                <td class="px-4 py-3">{{ Str::limit($category->description, 50, '...') ?: '-' }}</td>
+                                <td class="px-4 py-3">{{ $category->products_count }}</td>
+                                <td class="px-4 py-3 text-center">
+                                    {{-- Tombol Aksi Dropdown --}}
+                                    <button id="category-options-{{ $category->id }}" data-dropdown-toggle="dropdown-{{ $category->id }}" class="inline-flex items-center text-gray-500 hover:text-gray-800 dark:hover:text-white focus:ring-4 focus:outline-none focus:ring-gray-100 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" type="button">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
+                                    <div id="dropdown-{{ $category->id }}" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
+                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="category-options-{{ $category->id }}">
+                                            <li>
+                                                <a href="{{ route('categories.show', $category->id) }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                    <i class="fas fa-eye mr-2"></i>Lihat Detail
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button data-modal-target="edit-category-modal-{{ $category->id }}" data-modal-toggle="edit-category-modal-{{ $category->id }}" class="w-full text-left block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
+                                                    <i class="fas fa-edit mr-2"></i>Edit
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button data-modal-target="delete-category-modal-{{ $category->id }}" data-modal-toggle="delete-category-modal-{{ $category->id }}" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500 dark:hover:text-white">
+                                                     <i class="fas fa-trash mr-2"></i>Hapus
+                                                </button>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                             <tr>
+                                <td colspan="5" class="py-8 px-4 text-center">
+                                    <svg class="mx-auto mb-4 w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M5 8h14M5 11h14M5 14h14M5 17h14M5 20h14" />
+                                    </svg>
+                                    <h5 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Tidak Ada Kategori Ditemukan</h5>
+                                    <p class="font-normal text-gray-500">Mulai dengan menambahkan kategori produk pertama Anda.</p>
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
-        </div>
-    </div>
-</div>
 
-{{-- Modal untuk Tambah/Edit Kategori --}}
-<div id="add-category-modal" tabindex="-1" aria-hidden="true" class="hidden overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-modal md:h-full">
-    <div class="relative w-full h-full max-w-md p-4 md:h-auto">
-        <div class="relative p-4 bg-white rounded-lg shadow dark:bg-gray-800 sm:p-5">
-            <div class="flex items-center justify-between pb-4 mb-4 border-b rounded-t sm:mb-5 dark:border-gray-600">
-                <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-                    Tambah Kategori Baru
-                </h3>
-                <button type="button" class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center dark:hover:bg-gray-600 dark:hover:text-white" data-modal-toggle="add-category-modal">
-                    <svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
-                    <span class="sr-only">Close modal</span>
-                </button>
+            {{-- Paginasi --}}
+            {{-- CATATAN: Navigasi disederhanakan untuk memperbaiki tumpang tindih --}}
+            <div class="p-4 border-t dark:border-gray-700">
+                {!! $categories->appends(request()->query())->links() !!}
             </div>
-            <form action="#">
-                <div class="grid gap-4 mb-4 sm:grid-cols-1">
-                    <div>
-                        <label for="name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nama Kategori</label>
-                        <input type="text" name="name" id="name" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Contoh: Elektronik" required>
-                    </div>
-                </div>
-                <button type="submit" class="text-white inline-flex items-center bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
-                    <svg class="w-4 h-4 mr-2 -ml-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd"></path></svg>
-                    Simpan
-                </button>
-            </form>
         </div>
     </div>
-</div>
+</section>
+
+{{-- Memanggil partial untuk modal tambah --}}
+@include('app.pages.categories.partials.add-modal')
+
+{{-- Loop untuk memanggil modal edit & hapus (agar modalnya ada di HTML) --}}
+@if($categories->count() > 0)
+    @foreach ($categories as $category)
+        @include('app.pages.categories.partials.edit-modal', ['category' => $category])
+        @include('app.pages.categories.partials.delete-modal', ['category' => $category])
+    @endforeach
+@endif
 
 @endsection
 
-@push('scripts')
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        initFlowbite();
-        // --- KONFIGURASI & VARIABEL GLOBAL ---
-        const apiToken = '4|L6VjLfdU3azZWiXfa4ztAmLWak5y4fV2wNt3juWm94cd84a5'; // <<< GANTI TOKEN INI
-        const tableBody = document.querySelector('tbody');
-        const addCategoryModal = document.getElementById('add-category-modal');
-        const modalForm = addCategoryModal.querySelector('form');
-        const modalTitle = addCategoryModal.querySelector('h3');
-        const modalSubmitButton = addCategoryModal.querySelector('button[type="submit"]');
-
-        let editCategoryId = null; // Untuk melacak ID saat mode edit
-
-        // --- FUNGSI-FUNGSI UTAMA ---
-
-        // 1. Fungsi untuk mengambil dan menampilkan semua kategori
-        function fetchCategories() {
-            tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center">Memuat data...</td></tr>';
-            fetch('/api/categories', {
-                headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                tableBody.innerHTML = ''; // Kosongkan tabel
-                if (data.data.length > 0) {
-                    let number = 1;
-                    data.data.forEach(category => {
-                        const row = document.createElement('tr');
-                        row.className = 'hover:bg-gray-100 dark:hover:bg-gray-700';
-                        row.innerHTML = `
-                            <td class="p-4 text-sm font-normal text-gray-500 whitespace-nowrap dark:text-gray-400">${number++}</td>
-                            <td class="p-4 text-sm font-semibold text-gray-900 whitespace-nowrap dark:text-white">${category.name}</td>
-                            <td class="p-4 space-x-2 whitespace-nowrap">
-                                <button type="button" class="edit-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white rounded-lg bg-yellow-400 hover:bg-yellow-500" data-id="${category.id}">Edit</button>
-                                <button type="button" class="delete-btn inline-flex items-center px-3 py-2 text-sm font-medium text-center text-white bg-red-600 rounded-lg hover:bg-red-700" data-id="${category.id}">Hapus</button>
-                            </td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                } else {
-                    tableBody.innerHTML = '<tr><td colspan="3" class="p-4 text-center">Tidak ada data kategori.</td></tr>';
-                }
-                attachActionListeners(); // Pasang event listener ke tombol baru
-            })
-            .catch(error => console.error('Error fetching categories:', error));
-        }
-
-        // 2. Fungsi untuk memasang event listener pada tombol Edit dan Hapus
-        function attachActionListeners() {
-            // Event listener untuk tombol Edit
-            document.querySelectorAll('.edit-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    editCategoryId = this.dataset.id;
-                    // Ambil data kategori spesifik dari API
-                    fetch(`/api/categories/${editCategoryId}`, {
-                        headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Isi form dengan data yang ada
-                        modalForm.querySelector('#name').value = data.data.name;
-                        // Ubah judul dan teks tombol modal
-                        modalTitle.textContent = 'Edit Kategori';
-                        modalSubmitButton.textContent = 'Simpan Perubahan';
-                        // Tampilkan modal (menggunakan toggle dari Flowbite)
-                        new Flowbite.Modal(addCategoryModal).show();
-                    });
-                });
-            });
-
-            // Event listener untuk tombol Hapus
-            document.querySelectorAll('.delete-btn').forEach(button => {
-                button.addEventListener('click', function() {
-                    const categoryId = this.dataset.id;
-                    if (confirm('Anda yakin ingin menghapus kategori ini?')) {
-                        fetch(`/api/categories/${categoryId}`, {
-                            method: 'DELETE',
-                            headers: { 'Authorization': `Bearer ${apiToken}`, 'Accept': 'application/json' }
-                        })
-                        .then(response => {
-                            if (response.ok) {
-                                alert('Kategori berhasil dihapus.');
-                                fetchCategories(); // Refresh tabel
-                            } else {
-                                alert('Gagal menghapus kategori.');
-                            }
-                        });
-                    }
-                });
-            });
-        }
-
-        // --- EVENT LISTENERS ---
-
-        // Event listener untuk tombol "Tambah Kategori"
-        document.querySelector('[data-modal-toggle="add-category-modal"]').addEventListener('click', function() {
-            editCategoryId = null; // Mode "tambah", bukan "edit"
-            modalForm.reset(); // Kosongkan form
-            modalTitle.textContent = 'Tambah Kategori Baru';
-            modalSubmitButton.textContent = 'Simpan';
-        });
-
-        // Event listener untuk form submission di dalam modal
-        modalForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(modalForm);
-            const data = Object.fromEntries(formData.entries());
-            
-            const method = editCategoryId ? 'PUT' : 'POST';
-            const url = editCategoryId ? `/api/categories/${editCategoryId}` : '/api/categories';
-            
-            fetch(url, {
-                method: method,
-                headers: {
-                    'Authorization': `Bearer ${apiToken}`,
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
-                if (result.errors) {
-                    let errorMessages = Object.values(result.errors).map(error => error[0]).join('\n');
-                    alert(`Gagal menyimpan:\n${errorMessages}`);
-                } else {
-                    alert('Data kategori berhasil disimpan.');
-                    new Flowbite.Modal(addCategoryModal).hide(); // Sembunyikan modal
-                    fetchCategories(); // Refresh tabel
-                }
-            })
-            .catch(error => console.error('Error submitting form:', error));
-        });
-
-        // --- INISIALISASI ---
-        fetchCategories(); // Panggil fungsi utama saat halaman dimuat
-    });
-</script>
-@endpush
