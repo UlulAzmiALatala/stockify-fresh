@@ -46,7 +46,7 @@
                         {{-- Data akan diisi oleh JavaScript --}}
                     </tbody>
                 </table>
-            </div>
+            </div>  
         </div>
     </div>
 </div>
