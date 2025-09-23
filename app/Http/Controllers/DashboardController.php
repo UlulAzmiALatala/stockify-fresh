@@ -2,60 +2,55 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\StockTransaction;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use App\Models\Supplier;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     /**
-     * Tampilkan dashboard berdasarkan peran pengguna yang login,
-     * lengkap dengan data ringkasan yang relevan.
+     * Tampilkan dashboard berdasarkan peran pengguna yang login.
      */
     public function index()
     {
         $user = Auth::user();
 
-        // Tampilkan dashboard untuk Admin
-        if ($user->hasRole('Admin')) {
-            $data = [
-                'productCount' => Product::count(),
-                'supplierCount' => \App\Models\Supplier::count(),
-                'transactionInToday' => StockTransaction::where('type', 'Masuk')->whereDate('date', today())->count(),
-                'transactionOutToday' => StockTransaction::where('type', 'Keluar')->whereDate('date', today())->count(),
-                'latestUsers' => User::latest()->take(5)->get(),
-            ];
-            return view('app.pages.admin.dashboard', $data);
+        if (!$user) {
+            return redirect()->route('login');
         }
 
-        // Tampilkan dashboard untuk Manajer Gudang
-        if ($user->hasRole('Manajer Gudang')) {
-            $data = [
-                // Menghitung produk yang stoknya di bawah atau sama dengan stok minimum
-                'lowStockProductsCount' => Product::whereColumn('stock', '<=', 'minimum_stock')->count(),
-                'transactionInToday' => StockTransaction::where('type', 'Masuk')->whereDate('date', today())->count(),
-                'transactionOutToday' => StockTransaction::where('type', 'Keluar')->whereDate('date', today())->count(),
-                'totalProducts' => Product::count(),
-            ];
-            return view('app.pages.manager.dashboard', $data);
+        if ($user->hasRole('admin')) {
+            // PERBAIKAN: Mendefinisikan variabel secara eksplisit
+            $totalProducts = Product::count();
+            $totalSuppliers = Supplier::count();
+            $totalUsers = User::count();
+            $latestUsers = User::latest()->take(5)->get();
+
+            // PERBAIKAN: Mengirim variabel menggunakan compact()
+            return view('app.pages.admin.dashboard', compact('totalProducts', 'totalSuppliers', 'totalUsers', 'latestUsers'));
         }
 
-        // Tampilkan dashboard untuk Staff Gudang
-        if ($user->hasRole('Staff Gudang')) {
-            // Asumsi status 'Menunggu Konfirmasi' untuk barang masuk & 'Siap Dikirim' untuk barang keluar
-            // Anda bisa menyesuaikan status ini sesuai implementasi di database.
-            $data = [
-                'pendingConfirmationIn' => StockTransaction::where('type', 'Masuk')->where('status', 'Menunggu Konfirmasi')->count(),
-                'readyForShipmentOut' => StockTransaction::where('type', 'Keluar')->where('status', 'Siap Dikirim')->count(),
-            ];
-            return view('app.pages.staff.dashboard', $data);
+        if ($user->hasRole('manager')) {
+            $today = Carbon::today();
+            $totalProducts = Product::count();
+            $lowStockProducts = Product::whereColumn('stock', '<=', 'minimum_stock')->count();
+            $stockInToday = StockTransaction::where('type', 'Masuk')->whereDate('date', $today)->sum('quantity');
+            $stockOutToday = StockTransaction::where('type', 'Keluar')->whereDate('date', $today)->sum('quantity');
+
+            return view('app.pages.manager.dashboard', compact('totalProducts', 'lowStockProducts', 'stockInToday', 'stockOutToday'));
         }
 
-        // Jika tidak memiliki peran yang sesuai, arahkan ke halaman login
-        Auth::logout();
-        return redirect()->route('login')->with('error', 'Anda tidak memiliki peran yang valid.');
+        if ($user->hasRole('staff')) {
+            $pendingStockIn = StockTransaction::where('type', 'Masuk')->where('status', 'Menunggu Konfirmasi')->count();
+            $pendingStockOut = StockTransaction::where('type', 'Keluar')->where('status', 'Disiapkan')->count();
+
+            return view('app.pages.staff.dashboard', compact('pendingStockIn', 'pendingStockOut'));
+        }
+
+        return redirect()->route('login');
     }
 }
