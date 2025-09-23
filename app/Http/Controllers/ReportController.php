@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\StockTransaction;
+use App\Models\Category;
 use Illuminate\Http\Request;
 
 class ReportController extends Controller
@@ -14,8 +15,7 @@ class ReportController extends Controller
      */
     public function stockStatus(Request $request)
     {
-        // Query dasar untuk produk
-        $query = Product::with(['category', 'supplier'])->orderBy('name');
+        $query = Product::with(['category', 'supplier'])->latest();
 
         // Filter berdasarkan kategori jika ada
         if ($request->filled('category_id')) {
@@ -27,12 +27,14 @@ class ReportController extends Controller
             $query->whereColumn('stock', '<=', 'minimum_stock');
         }
 
-        $products = $query->get();
+        // PENYEMPURNAAN: Menggunakan paginasi agar konsisten
+        $products = $query->paginate(15)->appends($request->query());
 
-        // Mengambil semua kategori untuk filter dropdown
-        $categories = \App\Models\Category::orderBy('name')->get();
+        $categories = Category::orderBy('name')->get();
 
-        return view('app.pages.reports.stock-status', compact('products', 'categories'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        // Anda mungkin perlu membuat file view ini jika belum ada.
+        return view('app.pages.manager.reports.stock', compact('products', 'categories'));
     }
 
     /**
@@ -41,7 +43,6 @@ class ReportController extends Controller
      */
     public function transactionHistory(Request $request)
     {
-        // Validasi input filter
         $request->validate([
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
@@ -50,12 +51,10 @@ class ReportController extends Controller
 
         $query = StockTransaction::with(['product', 'user'])->latest();
 
-        // Filter berdasarkan tipe transaksi
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Filter berdasarkan rentang tanggal
         if ($request->filled('start_date')) {
             $query->whereDate('date', '>=', $request->start_date);
         }
@@ -65,6 +64,8 @@ class ReportController extends Controller
 
         $transactions = $query->paginate(20)->appends($request->query());
 
-        return view('app.pages.reports.transaction-history', compact('transactions'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        // Anda mungkin perlu membuat file view ini jika belum ada.
+        return view('app.pages.manager.reports.transaction-history', compact('transactions'));
     }
 }

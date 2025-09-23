@@ -27,7 +27,8 @@ class StockTransactionController extends Controller
 
         $transactions = $query->paginate(15);
 
-        return view('app.pages.transactions.index', compact('transactions'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.transactions.index', compact('transactions'));
     }
 
     /**
@@ -36,7 +37,8 @@ class StockTransactionController extends Controller
     public function createStockIn()
     {
         $products = Product::orderBy('name')->get();
-        return view('app.pages.transactions.stock-in', compact('products'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.transactions.stock-in', compact('products'));
     }
 
     /**
@@ -63,7 +65,7 @@ class StockTransactionController extends Controller
                     'type' => 'Masuk',
                     'quantity' => $request->quantity,
                     'date' => $request->date,
-                    'status' => 'Diterima',
+                    'status' => 'Diterima', // Atau 'Menunggu Konfirmasi' jika perlu alur staff
                     'notes' => $request->notes,
                 ]);
 
@@ -83,7 +85,8 @@ class StockTransactionController extends Controller
     public function createStockOut()
     {
         $products = Product::orderBy('name')->get();
-        return view('app.pages.transactions.stock-out', compact('products'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.transactions.stock-out', compact('products'));
     }
 
     /**
@@ -116,7 +119,7 @@ class StockTransactionController extends Controller
                     'type' => 'Keluar',
                     'quantity' => $request->quantity,
                     'date' => $request->date,
-                    'status' => 'Dikeluarkan',
+                    'status' => 'Dikeluarkan', // Atau 'Disiapkan' jika perlu alur staff
                     'notes' => $request->notes,
                 ]);
 

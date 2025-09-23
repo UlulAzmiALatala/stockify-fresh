@@ -27,8 +27,8 @@ class SupplierController extends Controller
         // withCount('products') untuk menghitung jumlah produk terkait supplier
         $suppliers = $query->withCount('products')->latest()->paginate(10);
 
-        // Mengembalikan view dengan data suppliers
-        return view('app.pages.suppliers.index', compact('suppliers'));
+        // PENYESUAIAN: Path view diubah ke folder admin
+        return view('app.pages.admin.suppliers.index', compact('suppliers'));
     }
 
     /**

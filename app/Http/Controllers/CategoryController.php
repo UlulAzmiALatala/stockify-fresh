@@ -25,7 +25,8 @@ class CategoryController extends Controller
         // paginate(10) untuk membatasi data per halaman
         $categories = $query->withCount('products')->latest()->paginate(10);
 
-        return view('app.pages.categories.index', compact('categories'));
+        // PENYESUAIAN: Path view diubah agar sesuai dengan struktur folder
+        return view('app.pages.admin.categories.index', compact('categories'));
     }
 
     /**
@@ -37,7 +38,8 @@ class CategoryController extends Controller
         // Ini akan mencegah N+1 query problem di halaman detail
         $category->load('products.supplier');
 
-        return view('app.pages.categories.show', compact('category'));
+        // PENYESUAIAN: Path view diubah agar sesuai dengan struktur folder
+        return view('app.pages.admin.categories.show', compact('category'));
     }
 
 

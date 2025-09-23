@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Supplier;
 use App\Models\Attribute;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
@@ -29,7 +30,8 @@ class ProductController extends Controller
 
         $products = $query->latest()->paginate(10);
 
-        return view('app.pages.products.index', compact('products'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.products.index', compact('products'));
     }
 
     /**
@@ -37,12 +39,12 @@ class ProductController extends Controller
      */
     public function create()
     {
-        // Mengambil semua kategori dan supplier untuk ditampilkan di form
         $categories = Category::orderBy('name')->get();
         $suppliers = Supplier::orderBy('name')->get();
-        $attributes = Attribute::all();
+        $attributes = Attribute::orderBy('name')->get();
 
-        return view('app.pages.products.create', compact('categories', 'suppliers', 'attributes'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.products.create', compact('categories', 'suppliers', 'attributes'));
     }
 
     /**
@@ -50,7 +52,6 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input dari form
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:products,name',
             'sku' => 'required|string|max:100|unique:products,sku',
@@ -61,18 +62,31 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'attributes' => 'nullable|array',
-            'attributes.*.name' => 'nullable|string',
-            'attributes.*.value' => 'nullable|string',
+            'product_attributes' => 'nullable|array', // Diubah untuk relasi
+            'product_attributes.*.id' => 'required|exists:attributes,id',
+            'product_attributes.*.value' => 'required|string|max:255',
         ]);
 
-        // Handle unggahan gambar
-        if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('public/products');
-            $validated['image'] = $path;
-        }
+        DB::transaction(function () use ($request, $validated) {
+            // Handle unggahan gambar
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('public/products');
+                $validated['image'] = $path;
+            }
 
-        Product::create($validated);
+            $product = Product::create($validated);
+
+            // PENYEMPURNAAN: Menyimpan relasi many-to-many ke tabel pivot
+            if ($request->has('product_attributes')) {
+                $attributesToSync = [];
+                foreach ($request->product_attributes as $attr) {
+                    if (!empty($attr['id']) && !empty($attr['value'])) {
+                        $attributesToSync[$attr['id']] = ['value' => $attr['value']];
+                    }
+                }
+                $product->attributes()->sync($attributesToSync);
+            }
+        });
 
         return redirect()->route('products.index')
             ->with('success', 'Produk baru berhasil ditambahkan.');
@@ -84,11 +98,14 @@ class ProductController extends Controller
      */
     public function edit(Product $product)
     {
+        // Eager load relasi attributes untuk ditampilkan di form
+        $product->load('attributes');
         $categories = Category::orderBy('name')->get();
         $suppliers = Supplier::orderBy('name')->get();
-        $attributes = Attribute::all();
+        $attributes = Attribute::orderBy('name')->get();
 
-        return view('app.pages.products.edit', compact('product', 'categories', 'suppliers', 'attributes'));
+        // PENYESUAIAN: Path view diubah ke folder manager
+        return view('app.pages.manager.products.edit', compact('product', 'categories', 'suppliers', 'attributes'));
     }
 
     /**
@@ -96,7 +113,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        // Validasi input
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:products,name,' . $product->id,
             'sku' => 'required|string|max:100|unique:products,sku,' . $product->id,
@@ -107,23 +123,34 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'attributes' => 'nullable|array', // Validasi atribut
-            'attributes.*.name' => 'nullable|string',
-            'attributes.*.value' => 'nullable|string',
+            'product_attributes' => 'nullable|array', // Diubah untuk relasi
+            'product_attributes.*.id' => 'required|exists:attributes,id',
+            'product_attributes.*.value' => 'required|string|max:255',
         ]);
 
-        // Handle unggahan gambar jika ada gambar baru
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($product->image) {
-                Storage::delete($product->image);
+        DB::transaction(function () use ($request, $product, $validated) {
+            // Handle unggahan gambar jika ada gambar baru
+            if ($request->hasFile('image')) {
+                if ($product->image) {
+                    Storage::delete($product->image);
+                }
+                $path = $request->file('image')->store('public/products');
+                $validated['image'] = $path;
             }
-            // Simpan gambar baru
-            $path = $request->file('image')->store('public/products');
-            $validated['image'] = $path;
-        }
 
-        $product->update($validated);
+            $product->update($validated);
+
+            // PENYEMPURNAAN: Menyimpan relasi many-to-many ke tabel pivot
+            $attributesToSync = [];
+            if ($request->has('product_attributes')) {
+                foreach ($request->product_attributes as $attr) {
+                    if (!empty($attr['id']) && !empty($attr['value'])) {
+                        $attributesToSync[$attr['id']] = ['value' => $attr['value']];
+                    }
+                }
+            }
+            $product->attributes()->sync($attributesToSync);
+        });
 
         return redirect()->route('products.index')
             ->with('success', 'Data produk berhasil diperbarui.');
@@ -134,18 +161,21 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        // Pengecekan apakah produk memiliki transaksi stok
         if ($product->stockTransactions()->count() > 0) {
             return redirect()->route('products.index')
                 ->with('error', 'Gagal! Produk ini memiliki riwayat transaksi stok.');
         }
 
-        // Hapus gambar dari storage jika ada
-        if ($product->image) {
-            Storage::delete($product->image);
-        }
+        DB::transaction(function () use ($product) {
+            // Hapus relasi di tabel pivot terlebih dahulu
+            $product->attributes()->detach();
 
-        $product->delete();
+            if ($product->image) {
+                Storage::delete($product->image);
+            }
+
+            $product->delete();
+        });
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');

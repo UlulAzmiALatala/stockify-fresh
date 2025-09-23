@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -14,9 +16,9 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $query = User::query();
+        // Eager load relasi roles untuk efisiensi
+        $query = User::with('roles');
 
-        // Logika pencarian berdasarkan nama atau email
         if ($request->filled('search')) {
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
@@ -27,7 +29,8 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(10);
 
-        return view('app.pages.users.index', compact('users'));
+        // PENYESUAIAN: Path view diubah ke folder admin
+        return view('app.pages.admin.users.index', compact('users'));
     }
 
     /**
@@ -35,21 +38,25 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'role' => ['required', 'in:Admin,Manajer Gudang,Staff Gudang'], // Sesuaikan dengan enum di database
+            // PENYESUAIAN: Validasi role berdasarkan tabel 'roles' dari Spatie
+            'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
-        // Membuat user baru
-        User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password), // Password di-hash demi keamanan
-            'role' => $request->role,
-        ]);
+        DB::transaction(function () use ($request) {
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+            ]);
+
+            // PENYESUAIAN: Menetapkan role menggunakan metode dari Spatie
+            $user->assignRole($request->role);
+        });
+
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna baru berhasil ditambahkan.');
@@ -60,27 +67,28 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Validasi input
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class . ',email,' . $user->id],
-            'role' => ['required', 'in:Admin,Manajer Gudang,Staff Gudang'],
-            'password' => ['nullable', 'confirmed', Rules\Password::defaults()], // Password opsional
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
+            'role' => ['required', 'string', 'exists:roles,name'],
+            'password' => ['nullable', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Menyiapkan data untuk di-update
-        $updateData = [
-            'name' => $request->name,
-            'email' => $request->email,
-            'role' => $request->role,
-        ];
+        DB::transaction(function () use ($request, $user) {
+            $updateData = [
+                'name' => $request->name,
+                'email' => $request->email,
+            ];
 
-        // Jika password diisi, update passwordnya
-        if ($request->filled('password')) {
-            $updateData['password'] = Hash::make($request->password);
-        }
+            if ($request->filled('password')) {
+                $updateData['password'] = Hash::make($request->password);
+            }
 
-        $user->update($updateData);
+            $user->update($updateData);
+
+            // PENYESUAIAN: Sinkronisasi role menggunakan metode dari Spatie
+            $user->syncRoles($request->role);
+        });
 
         return redirect()->route('users.index')
             ->with('success', 'Data pengguna berhasil diperbarui.');
@@ -91,12 +99,13 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        // Mencegah pengguna menghapus dirinya sendiri
         if (auth()->id() == $user->id) {
             return redirect()->route('users.index')
                 ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
+        // PENYEMPURNAAN: Hapus semua role dari user sebelum menghapus user
+        $user->roles()->detach();
         $user->delete();
 
         return redirect()->route('users.index')

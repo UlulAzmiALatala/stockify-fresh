@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Spatie\Permission\Traits\HasRoles;
+use Spatie\Permission\Traits\HasRoles; // Import trait dari Spatie
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRoles; // 2. Tambahkan "HasRoles" di sini
+    use HasFactory, Notifiable, HasRoles; // Menggunakan trait HasRoles
 
     /**
      * The attributes that are mass assignable.
@@ -22,7 +22,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'role', // Jika Anda masih menggunakan kolom 'role'
+        // PENYESUAIAN: Kolom 'role' dihapus karena kita menggunakan Spatie
     ];
 
     /**
