@@ -1,38 +1,17 @@
-@extends('app.layouts.app')
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+            {{ __('Dashboard') }}
+        </h2>
+    </x-slot>
 
-@section('title', 'Dashboard Utama')
-
-@section('content')
-<div class="p-4">
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        
-        {{-- Kartu Total Produk --}}
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Total Produk</h3>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $totalProducts ?? '0' }}</p>
-        </div>
-
-        {{-- Kartu Stok Menipis --}}
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Stok Menipis</h3>
-            <p class="text-3xl font-bold text-red-500 mt-2">{{ $lowStockProducts ?? '0' }}</p>
-        </div>
-
-        {{-- Kartu Total Supplier --}}
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Total Supplier</h3>
-            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $totalSuppliers ?? '0' }}</p>
-        </div>
-
-        {{-- Kartu Transaksi Hari Ini (Contoh) --}}
-        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
-            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Transaksi Hari Ini</h3>
-            {{-- Anda bisa meminta teman back-end Anda untuk membuat variabel ini juga --}}
-            <p class="text-3xl font-bold text-gray-900 dark:text-white mt-2">{{ $todayTransactions ?? '0' }}</p>
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900 dark:text-gray-100">
+                    {{ __("You're logged in!") }}
+                </div>
+            </div>
         </div>
     </div>
-
-    {{-- Anda bisa menambahkan konten lain di sini, seperti grafik atau tabel ringkasan --}}
-
-</div>
-@endsection
+</x-app-layout>
