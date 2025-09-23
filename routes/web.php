@@ -8,6 +8,8 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StockTransactionController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\DashboardController; // Tambahkan ini
+use App\Http\Controllers\AttributeController; // Tambahkan ini
 
 /*
 |--------------------------------------------------------------------------
@@ -28,26 +30,27 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // Dashboard
-    Route::get('/dashboard', function () {
-        return view('app.pages.dashboard');
-    })->name('dashboard'); // Nama route lebih sederhana
+    // Ubah rute dashboard lama dengan DashboardController
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- MANAJEMEN DATA MASTER ---
 
-    // Manajemen Kategori (Sudah kita buat)
+    // Manajemen Kategori
     Route::resource('categories', CategoryController::class);
 
     // Manajemen Supplier
     Route::resource('suppliers', SupplierController::class);
 
+    // Manajemen Atribut Produk (Baru)
+    Route::resource('attributes', AttributeController::class);
+
     // Manajemen Produk
     Route::resource('products', ProductController::class);
 
     // --- MANAJEMEN PENGGUNA (Hanya Admin) ---
-    // Route::middleware(['role:Admin'])->group(function() {
+    // Route::middleware(['role:admin'])->group(function() {
     Route::resource('users', UserController::class);
     // });
-    // Catatan: Middleware role akan kita aktifkan nanti saat manajemen user dibuat
 
     // --- MANAJEMEN STOK & TRANSAKSI ---
 

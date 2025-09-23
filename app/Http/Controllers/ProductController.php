@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Supplier;
+use App\Models\Attribute;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -39,8 +40,9 @@ class ProductController extends Controller
         // Mengambil semua kategori dan supplier untuk ditampilkan di form
         $categories = Category::orderBy('name')->get();
         $suppliers = Supplier::orderBy('name')->get();
+        $attributes = Attribute::all();
 
-        return view('app.pages.products.create', compact('categories', 'suppliers'));
+        return view('app.pages.products.create', compact('categories', 'suppliers', 'attributes'));
     }
 
     /**
@@ -58,7 +60,10 @@ class ProductController extends Controller
             'purchase_price' => 'required|numeric|min:0',
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'attributes' => 'nullable|array',
+            'attributes.*.name' => 'nullable|string',
+            'attributes.*.value' => 'nullable|string',
         ]);
 
         // Handle unggahan gambar
@@ -81,8 +86,9 @@ class ProductController extends Controller
     {
         $categories = Category::orderBy('name')->get();
         $suppliers = Supplier::orderBy('name')->get();
+        $attributes = Attribute::all();
 
-        return view('app.pages.products.edit', compact('product', 'categories', 'suppliers'));
+        return view('app.pages.products.edit', compact('product', 'categories', 'suppliers', 'attributes'));
     }
 
     /**
@@ -101,6 +107,9 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'attributes' => 'nullable|array', // Validasi atribut
+            'attributes.*.name' => 'nullable|string',
+            'attributes.*.value' => 'nullable|string',
         ]);
 
         // Handle unggahan gambar jika ada gambar baru
