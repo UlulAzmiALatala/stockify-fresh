@@ -8,74 +8,54 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StockTransactionController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\DashboardController; // Tambahkan ini
-use App\Http\Controllers\AttributeController; // Tambahkan ini
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\AttributeController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Di sinilah kita mendefinisikan semua rute untuk aplikasi web kita
-| yang menggunakan pendekatan Server-Side Rendering (SSR).
-|
 */
 
 // Halaman utama diarahkan ke halaman login
+// Catatan: Rute 'login' utama akan ditangani oleh auth.php
 Route::get('/', function () {
     return view('auth.sign-in');
-})->name('login');
+});
 
-// Grup route yang butuh autentikasi dan status terverifikasi
-Route::middleware(['auth', 'verified'])->group(function () {
+// =========================================================================
+// PERBAIKAN: Middleware 'verified' dihapus untuk sementara
+// =========================================================================
+Route::middleware(['auth'])->group(function () {
 
     // Dashboard
-    // Ubah rute dashboard lama dengan DashboardController
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // --- MANAJEMEN DATA MASTER ---
-
-    // Manajemen Kategori
     Route::resource('categories', CategoryController::class);
-
-    // Manajemen Supplier
     Route::resource('suppliers', SupplierController::class);
-
-    // Manajemen Atribut Produk (Baru)
     Route::resource('attributes', AttributeController::class);
-
-    // Manajemen Produk
     Route::resource('products', ProductController::class);
 
-    // --- MANAJEMEN PENGGUNA (Hanya Admin) ---
-    // Route::middleware(['role:admin'])->group(function() {
+    // --- MANAJEMEN PENGGUNA ---
     Route::resource('users', UserController::class);
-    // });
 
     // --- MANAJEMEN STOK & TRANSAKSI ---
-
-    // Halaman utama transaksi
     Route::get('/transactions', [StockTransactionController::class, 'index'])->name('transactions.index');
-    // Form untuk barang masuk
     Route::get('/stock/in', [StockTransactionController::class, 'createStockIn'])->name('stock.in.create');
-    // Proses penyimpanan barang masuk
     Route::post('/stock/in', [StockTransactionController::class, 'storeStockIn'])->name('stock.in.store');
-    // Form untuk barang keluar
     Route::get('/stock/out', [StockTransactionController::class, 'createStockOut'])->name('stock.out.create');
-    // Proses penyimpanan barang keluar
     Route::post('/stock/out', [StockTransactionController::class, 'storeStockOut'])->name('stock.out.store');
-
 
     // --- LAPORAN ---
     Route::get('/reports/stock-status', [ReportController::class, 'stockStatus'])->name('reports.stock_status');
     Route::get('/reports/transactions', [ReportController::class, 'transactionHistory'])->name('reports.transactions');
 
-
-    // --- PROFIL PENGGUNA (Bawaan Breeze) ---
+    // --- PROFIL PENGGUNA ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Rute autentikasi bawaan Breeze
+// Rute autentikasi bawaan
 require __DIR__ . '/auth.php';

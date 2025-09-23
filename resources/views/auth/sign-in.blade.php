@@ -18,6 +18,20 @@
     </div>
 
     <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        
+        {{-- ========================================================== --}}
+        {{-- TAMBAHKAN BLOK INI UNTUK MENAMPILKAN ERROR YANG MUNGKIN TIDAK MUNCUL --}}
+        @if ($errors->any())
+            <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+        {{-- ========================================================== --}}
+
       <form method="POST" action="{{ route('login') }}" class="space-y-6">
         @csrf
 
@@ -38,9 +52,6 @@
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
             />
           </div>
-          @error('email')
-            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-          @enderror
         </div>
 
         <div>
@@ -67,9 +78,6 @@
               class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm"
             />
           </div>
-          @error('password')
-            <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-          @enderror
         </div>
 
         <div class="flex items-center">

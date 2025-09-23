@@ -12,8 +12,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Panggil seeder tunggal yang sudah lengkap
         $this->call([
-            RoleSeeder::class // <-- TAMBAHKAN BARIS INI
+            RoleAndUserSeeder::class
         ]);
     }
 }
