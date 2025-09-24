@@ -38,7 +38,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class);
 
     // --- MANAJEMEN PENGGUNA ---
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class)->names('admin.users');
 
     // --- MANAJEMEN STOK & TRANSAKSI ---
     Route::get('/transactions', [StockTransactionController::class, 'index'])->name('transactions.index');

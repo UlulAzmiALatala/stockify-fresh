@@ -51,21 +51,28 @@ Route::get('pages/500/', function () {
     return view('example.content.pages.500', ['title' => '500 - Server Error']);
 })->name('pages.500');
 
-// Authentication
+// =========================================================================
+// == PERBAIKAN ADA DI SINI ==
+// =========================================================================
 Route::get('authentication/sign-in', function () {
-    return view('example.content.authentication.sign-in', ['title' => 'Sign In']);
+    // Mengarahkan ke view 'auth.sign-in' yang benar
+    return view('auth.sign-in');
 })->name('sign-in');
 
 Route::get('authentication/sign-up', function () {
-    return view('example.content.authentication.sign-up', ['title' => 'Sign Up']);
+    // Mengarahkan ke view 'auth.sign-up' yang benar
+    return view('auth.sign-up');
 })->name('sign-up');
+// =========================================================================
 
 Route::get('authentication/forgot-password', function () {
-    return view('example.content.authentication.forgot-password', ['title' => 'Forgot Password']);
+    // Anda mungkin perlu menyesuaikan view ini juga jika ada
+    return view('auth.forgot-password');
 })->name('forgot-password');
 
 Route::get('authentication/reset-password', function () {
-    return view('example.content.authentication.reset-password', ['title' => 'Reset Password']);
+    // Anda mungkin perlu menyesuaikan view ini juga jika ada
+    return view('auth.reset-password');
 })->name('reset-password');
 
 Route::get('authentication/profile-lock', function () {

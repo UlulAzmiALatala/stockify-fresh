@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use Illuminate\Http\Request; // <-- 1. Pastikan ini di-import
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\StockTransaction;
@@ -15,7 +15,7 @@ class DashboardController extends Controller
     /**
      * Tampilkan dashboard berdasarkan peran pengguna yang login.
      */
-    public function index()
+    public function index(Request $request) // <-- 2. Tambahkan Request $request di sini
     {
         $user = Auth::user();
 
@@ -23,14 +23,19 @@ class DashboardController extends Controller
             return redirect()->route('login');
         }
 
+        if ($user->roles->isEmpty()) {
+            Auth::logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+            return redirect('/login')->with('error', 'Akun Anda tidak memiliki peran. Silakan hubungi administrator.');
+        }
+
         if ($user->hasRole('admin')) {
-            // PERBAIKAN: Mendefinisikan variabel secara eksplisit
             $totalProducts = Product::count();
             $totalSuppliers = Supplier::count();
             $totalUsers = User::count();
             $latestUsers = User::latest()->take(5)->get();
 
-            // PERBAIKAN: Mengirim variabel menggunakan compact()
             return view('app.pages.admin.dashboard', compact('totalProducts', 'totalSuppliers', 'totalUsers', 'latestUsers'));
         }
 
