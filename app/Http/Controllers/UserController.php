@@ -34,6 +34,15 @@ class UserController extends Controller
     }
 
     /**
+     * Menampilkan formulir untuk membuat pengguna baru.
+     */
+    public function create()
+    {
+        // PENYESUAIAN: Mengembalikan view untuk form tambah pengguna
+        return view('app.pages.admin.users.create');
+    }
+
+    /**
      * Menyimpan pengguna baru ke dalam database.
      */
     public function store(Request $request)
