@@ -124,7 +124,7 @@
 </section>
 
 {{-- Memanggil partial untuk modal tambah --}}
-@include('app.pages.categories.partials.add-modal')
+@include('app.pages.admin.categories.partials.add-modal')
 
 {{-- Loop untuk memanggil modal edit & hapus (agar modalnya ada di HTML) --}}
 @if($categories->count() > 0)
