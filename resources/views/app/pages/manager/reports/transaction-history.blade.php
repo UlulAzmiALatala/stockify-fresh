@@ -18,7 +18,10 @@
     </div>
 
     {{-- KONTEN UTAMA --}}
-    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+    {{-- ========================================================== --}}
+    {{-- == PERBAIKAN: Kelas 'overflow-hidden' dihapus dari sini == --}}
+    {{-- ========================================================== --}}
+    <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
         
         {{-- BAGIAN FILTER --}}
         <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -61,7 +64,7 @@
                 <tbody>
                     @forelse ($transactions as $transaction)
                         <tr class="border-b dark:border-gray-700">
-                            <td class="px-4 py-3">{{ $transaction->date->format('d M Y, H:i') }}</td>
+                            <td class="px-4 py-3">{{ \Carbon\Carbon::parse($transaction->date)->format('d M Y, H:i') }}</td>
                             <td class="px-4 py-3">
                                 @if($transaction->type === 'Masuk')
                                     <span class="bg-green-100 text-green-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-green-900 dark:text-green-300">Masuk</span>
@@ -90,8 +93,8 @@
         </div>
 
         {{-- PAGINATION --}}
-        <div class="p-4">
-            {{ $transactions->links() }}
+        <div class="p-4 border-t dark:border-gray-700">
+            {!! $transactions->links() !!}
         </div>
     </div>
 </div>
@@ -122,7 +125,7 @@
                     <dd class="font-bold {{ $transaction->type === 'Masuk' ? 'text-green-500' : 'text-blue-500' }}">{{ $transaction->quantity }} Pcs</dd>
 
                     <dt class="font-semibold text-gray-900 dark:text-white">Tanggal:</dt>
-                    <dd class="text-gray-500 dark:text-gray-400">{{ $transaction->date->format('d F Y, H:i') }}</dd>
+                    <dd class="text-gray-500 dark:text-gray-400">{{ \Carbon\Carbon::parse($transaction->date)->format('d F Y, H:i') }}</dd>
 
                     <dt class="font-semibold text-gray-900 dark:text-white">Dicatat Oleh:</dt>
                     <dd class="text-gray-500 dark:text-gray-400">{{ $transaction->user->name ?? 'Sistem' }}</dd>
@@ -155,3 +158,4 @@
     });
 </script>
 @endpush
+

@@ -17,25 +17,29 @@
 
     {{-- Memuat CSS dan JS utama dari Vite --}}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+
+    @stack('styles')
 </head>
 
-{{-- PENYESUAIAN 1: Jadikan body sebagai flex container vertikal setinggi layar --}}
+{{-- Jadikan body sebagai flex container vertikal setinggi layar --}}
 <body class="bg-gray-50 dark:bg-gray-900 flex flex-col min-h-screen">
 
     {{-- Navbar dipanggil di sini --}}
     @include('app.components.navbar')
 
-    {{-- PENYESUAIAN 2: Biarkan wrapper ini tumbuh mengisi sisa ruang --}}
-    <div class="flex flex-grow pt-16 overflow-hidden bg-gray-50 dark:bg-gray-900">
+    {{-- ========================================================== --}}
+    {{-- == PERBAIKAN: Kelas 'overflow-hidden' dihapus dari sini == --}}
+    {{-- ========================================================== --}}
+    <div class="flex flex-grow pt-16 bg-gray-50 dark:bg-gray-900">
 
         {{-- Sidebar dipanggil di sini --}}
         @include('app.components.sidebar')
 
-        {{-- PENYESUAIAN 3: Jadikan area konten sebagai flex container vertikal juga --}}
+        {{-- Jadikan area konten sebagai flex container vertikal juga --}}
         <div id="main-content"
             class="relative w-full h-full overflow-y-auto bg-gray-50 lg:ml-64 dark:bg-gray-900 flex flex-col">
-            
-            {{-- PENYESUAIAN 4: Biarkan <main> tumbuh dan mendorong footer ke bawah --}}
+
+            {{-- Biarkan <main> tumbuh dan mendorong footer ke bawah --}}
             <main class="flex-grow">
                 {{-- Konten dari setiap halaman akan muncul di sini --}}
                 @yield('content')
@@ -52,4 +56,3 @@
 </body>
 
 </html>
-

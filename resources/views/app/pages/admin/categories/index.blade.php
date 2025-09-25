@@ -129,8 +129,8 @@
 {{-- Loop untuk memanggil modal edit & hapus (agar modalnya ada di HTML) --}}
 @if($categories->count() > 0)
     @foreach ($categories as $category)
-        @include('app.pages.categories.partials.edit-modal', ['category' => $category])
-        @include('app.pages.categories.partials.delete-modal', ['category' => $category])
+        @include('app.pages.admin.categories.partials.edit-modal', ['category' => $category])
+        @include('app.pages.admin.categories.partials.delete-modal', ['category' => $category])
     @endforeach
 @endif
 
