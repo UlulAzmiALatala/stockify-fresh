@@ -1,131 +1,79 @@
-<aside id="logo-sidebar"
-    class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700"
-    aria-label="Sidebar">
+<aside id="logo-sidebar" class="fixed top-0 left-0 z-40 w-64 h-screen pt-20 transition-transform -translate-x-full bg-white border-r border-gray-200 sm:translate-x-0 dark:bg-gray-800 dark:border-gray-700" aria-label="Sidebar">
     <div class="h-full px-3 pb-4 overflow-y-auto bg-white dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
 
-            {{-- MENU UTAMA --}}
+            {{-- 1. MENU DASHBOARD (Bisa dilihat semua role) --}}
             <li>
-                <a href="{{ route('dashboard') }}"
-                    class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {{ request()->routeIs('dashboard') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
-                    <i
-                        class="fa-solid fa-chart-pie w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
+                <a href="{{ route('dashboard') }}" 
+                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {{ request()->routeIs('dashboard') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-chart-pie"></i>
                     <span class="ms-3">Dashboard</span>
                 </a>
             </li>
 
+            {{-- 2. MENU TRANSAKSI (Tampilan berbeda untuk setiap role) --}}
+            <li>
+                <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-transactions" data-collapse-toggle="dropdown-transactions">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-arrow-right-arrow-left"></i>
+                    <span class="flex-1 ms-3 text-left">Stok</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <ul id="dropdown-transactions" class="py-2 space-y-2 {{ request()->routeIs('stock.*','transactions.*') ? '' : 'hidden' }}">
+                    {{-- Link untuk Admin & Manajer --}}
+                    @hasanyrole('admin|manager')
+                        <li><a href="{{ route('stock.in.create') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang Masuk</a></li>
+                        <li><a href="{{ route('stock.out.create') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang Keluar</a></li>
+                    @endhasanyrole
+
+                    {{-- Link Khusus untuk Staff Gudang --}}
+                    @role('staff')
+                         <li><a href="#" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Konfirmasi Penerimaan</a></li>
+                         <li><a href="#" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Konfirmasi Pengeluaran</a></li>
+                    @endrole
+                </ul>
+            </li>
+
+            {{-- 3. MENU MANAJEMEN DATA (Hanya Admin & Manajer) --}}
             @hasanyrole('admin|manager')
-                {{-- MENU TRANSAKSI (Admin & Manajer Gudang) --}}
-                <li>
-                    <button type="button"
-                        class="flex items-center w-full p-2 text-base text-gray-900 rounded-lg group dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-controls="dropdown-transactions" data-collapse-toggle="dropdown-transactions">
-                        <i
-                            class="fa-solid fa-arrow-right-arrow-left w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
-                        <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Transaksi</span>
-                        <i class="fa-solid fa-chevron-down w-3 h-3"></i>
-                    </button>
-                    <ul id="dropdown-transactions" class="hidden py-2 space-y-2">
-                        <li>
-                            <a href="{{ route('stock.in.create') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang
-                                Masuk</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('stock.out.create') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang
-                                Keluar</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('transactions.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Riwayat</a>
-                        </li>
-                    </ul>
-                </li>
+            <li>
+                <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-data" data-collapse-toggle="dropdown-data">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-database"></i>
+                    <span class="flex-1 ms-3 text-left">Manajemen Data</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <ul id="dropdown-data" class="py-2 space-y-2 {{ request()->routeIs('products.*','categories.*','suppliers.*','users.*') ? '' : 'hidden' }}">
+                    <li><a href="{{ route('products.index') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Produk</a></li>
+                    <li><a href="{{ route('suppliers.index') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Supplier</a></li>
+                    {{-- Kategori & Pengguna hanya untuk Admin --}}
+                    @role('admin')
+                        <li><a href="{{ route('categories.index') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Kategori</a></li>
+                        <li><a href="{{ route('users.index') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Pengguna</a></li>
+                    @endrole
+                </ul>
+            </li>
             @endhasanyrole
 
-            @hasanyrole('staff')
-                {{-- MENU TUGAS (Staff Gudang) --}}
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <i
-                            class="fa-solid fa-clipboard-check w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
-                        <span class="ms-3">Konfirmasi Barang Masuk</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="#"
-                        class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
-                        <i
-                            class="fa-solid fa-boxes-packing w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
-                        <span class="ms-3">Siapkan Barang Keluar</span>
-                    </a>
-                </li>
-            @endhasanyrole
-
+            {{-- 4. MENU LAPORAN (Hanya Admin & Manajer) --}}
             @hasanyrole('admin|manager')
-                {{-- MENU LAPORAN (Admin & Manajer Gudang) --}}
-                <li>
-                    <button type="button"
-                        class="flex items-center w-full p-2 text-base text-gray-900 rounded-lg group dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-controls="dropdown-reports" data-collapse-toggle="dropdown-reports">
-                        <i
-                            class="fa-solid fa-file-lines w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
-                        <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Laporan</span>
-                        <i class="fa-solid fa-chevron-down w-3 h-3"></i>
-                    </button>
-                    <ul id="dropdown-reports" class="hidden py-2 space-y-2">
-                        <li>
-                            <a href="{{ route('reports.stock_status') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Laporan
-                                Stok</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('reports.transactions') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Riwayat
-                                Transaksi</a>
-                        </li>
-                    </ul>
-                </li>
+            <li>
+                <a href="{{ route('reports.transactions') }}" 
+                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {{ request()->routeIs('reports.*') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-file-lines"></i>
+                    <span class="ms-3">Laporan</span>
+                </a>
+            </li>
             @endhasanyrole
-
-            @hasanyrole('admin')
-                {{-- PENGATURAN & MASTER DATA (Hanya Admin) --}}
-                <li class="pt-4 mt-4 space-y-2 font-medium border-t border-gray-200 dark:border-gray-700">
-                    <button type="button"
-                        class="flex items-center w-full p-2 text-base text-gray-900 rounded-lg group dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
-                        aria-controls="dropdown-master-data" data-collapse-toggle="dropdown-master-data">
-                        <i
-                            class="fa-solid fa-database w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"></i>
-                        <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Master Data</span>
-                        <i class="fa-solid fa-chevron-down w-3 h-3"></i>
-                    </button>
-                    <ul id="dropdown-master-data" class="hidden py-2 space-y-2">
-                        <li>
-                            <a href="{{ route('products.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Produk</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('categories.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Kategori</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('suppliers.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Supplier</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('attributes.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Atribut</a>
-                        </li>
-                        <li>
-                            <a href="{{ route('admin.users.index') }}"
-                                class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Manajemen Pengguna</a>
-                        </li>
-                    </ul>
-                </li>
-            @endhasanyrole
-
+            
+            {{-- 5. MENU PENGATURAN (Hanya Admin) --}}
+            @role('admin')
+            <li>
+                <a href="#" {{-- Arahkan ke route settings nanti --}}
+                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-gear"></i>
+                    <span class="ms-3">Pengaturan</span>
+                </a>
+            </li>
+            @endrole
         </ul>
     </div>
 </aside>
