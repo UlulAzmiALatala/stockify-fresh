@@ -27,9 +27,6 @@
     {{-- Navbar dipanggil di sini --}}
     @include('app.components.navbar')
 
-    {{-- ========================================================== --}}
-    {{-- == PERBAIKAN: Kelas 'overflow-hidden' dihapus dari sini == --}}
-    {{-- ========================================================== --}}
     <div class="flex flex-grow pt-16 bg-gray-50 dark:bg-gray-900">
 
         {{-- Sidebar dipanggil di sini --}}

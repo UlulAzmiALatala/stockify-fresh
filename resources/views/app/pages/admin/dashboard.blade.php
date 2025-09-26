@@ -10,9 +10,7 @@
                 <p class="text-sm text-gray-600">Ringkasan data dan aktivitas terkini.</p>
             </div>
 
-            <!-- Kartu Statistik -->
             <div class="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
-                <!-- Jumlah Produk -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -37,7 +35,6 @@
                     </div>
                 </div>
 
-                <!-- Jumlah Supplier -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -62,7 +59,6 @@
                     </div>
                 </div>
 
-                <!-- Transaksi Masuk Hari Ini -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -87,7 +83,6 @@
                     </div>
                 </div>
 
-                <!-- Transaksi Keluar Hari Ini -->
                 <div class="bg-white overflow-hidden shadow rounded-lg">
                     <div class="p-5">
                         <div class="flex items-center">
@@ -112,9 +107,12 @@
                     </div>
                 </div>
             </div>
-            <!-- End Kartu Statistik -->
-
-            <!-- Daftar Pengguna Terbaru -->
+            <div class="mt-8 bg-white shadow rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-700 mb-4">Grafik Stok Barang</h3>
+                <div>
+                    <canvas id="productStockChart"></canvas>
+                </div>
+            </div>
             <div class="mt-8 bg-white shadow rounded-lg overflow-x-auto">
                  <h3 class="text-lg font-semibold p-5 text-gray-700">Pengguna Terbaru</h3>
                 <table class="min-w-full leading-normal">
@@ -165,7 +163,54 @@
                     </tbody>
                 </table>
             </div>
-             <!-- End Daftar Pengguna Terbaru -->
-        </div>
+             </div>
     </div>
 @endsection
+
+@push('scripts')
+{{-- Memuat library Chart.js dari CDN --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Ambil data yang dikirim dari controller
+        const productNames = @json($productNames ?? []);
+        const productQuantities = @json($productQuantities ?? []);
+
+        // Dapatkan elemen canvas
+        const ctx = document.getElementById('productStockChart').getContext('2d');
+        
+        // Buat grafik baru
+        const productStockChart = new Chart(ctx, {
+            type: 'bar', // Jenis grafik: batang
+            data: {
+                labels: productNames, // Label untuk sumbu X (nama produk)
+                datasets: [{
+                    label: 'Jumlah Stok',
+                    data: productQuantities, // Data untuk sumbu Y (jumlah stok)
+                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true, // Mulai sumbu Y dari angka 0
+                        ticks: {
+                            // Memastikan angka di sumbu Y adalah bilangan bulat
+                            precision: 0
+                        }
+                    }
+                },
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                }
+            }
+        });
+    });
+</script>
+@endpush
