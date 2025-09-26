@@ -9,8 +9,12 @@
                     <i class="fa-solid fa-bars w-6 h-6"></i>
                 </button>
                 <a href="{{ route('dashboard') }}" class="flex items-center ms-2 md:me-24">
-                    <span
-                        class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">Stockify</span>
+                    {{-- PERBAIKAN: Menampilkan logo jika ada --}}
+                    @if($appLogo)
+                        <img src="{{ Storage::url($appLogo) }}" class="h-8 me-3" alt="{{ $appName ?? 'Stockify' }} Logo" />
+                    @endif
+                    {{-- PERBAIKAN: Selalu menampilkan nama aplikasi --}}
+                    <span class="self-center text-xl font-semibold sm:text-2xl whitespace-nowrap dark:text-white">{{ $appName ?? 'Stockify' }}</span>
                 </a>
             </div>
             <div class="flex items-center">
@@ -29,7 +33,7 @@
                             aria-expanded="false" data-dropdown-toggle="dropdown-user">
                             <span class="sr-only">Open user menu</span>
                             <div
-                                class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-bold">
+                                class="w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white font-bold">
                                 {{-- DINAMIS: Mengambil huruf pertama dari nama user --}}
                                 {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                             </div>
@@ -39,23 +43,19 @@
                         id="dropdown-user">
                         <div class="px-4 py-3" role="none">
                             <p class="text-sm text-gray-900 dark:text-white" role="none">
-                                {{-- DINAMIS: Mengambil nama user --}}
                                 {{ Auth::user()->name }}
                             </p>
                             <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
-                                {{-- DINAMIS: Mengambil email user --}}
                                 {{ Auth::user()->email }}
                             </p>
                         </div>
                         <ul class="py-1" role="none">
                             <li>
-                                {{-- DINAMIS: Mengarahkan ke halaman edit profil --}}
                                 <a href="{{ route('profile.edit') }}"
                                     class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
                                     role="menuitem">Profil</a>
                             </li>
                             <li>
-                                {{-- Tombol Logout sudah benar --}}
                                 <form method="POST" action="{{ route('logout') }}" role="none">
                                     @csrf
                                     <button type="submit"
@@ -72,3 +72,4 @@
         </div>
     </div>
 </nav>
+

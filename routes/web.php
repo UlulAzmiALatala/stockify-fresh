@@ -11,6 +11,7 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\SettingsController; // <-- Import SettingsController
 
 /*
 |--------------------------------------------------------------------------
@@ -50,10 +51,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock/prepare-out', [StockController::class, 'staffPrepareOut'])->name('staff.stock.prepare-out');
 
     // ==========================================================
-    // == PERBAIKAN: Rute baru untuk aksi konfirmasi Staf ==
+    // == RUTE BARU UNTUK PENGATURAN APLIKASI (ADMIN) ==
     // ==========================================================
-    Route::patch('/stock/confirm-in/{transaction}', [StockController::class, 'processConfirmIn'])->name('staff.stock.confirm-in.process');
-    Route::patch('/stock/prepare-out/{transaction}', [StockController::class, 'processPrepareOut'])->name('staff.stock.prepare-out.process');
+    Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
+    Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
+
 
     // --- RUTE PROFIL PENGGUNA ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

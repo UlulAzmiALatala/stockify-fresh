@@ -20,12 +20,10 @@
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
                 <ul id="dropdown-transactions" class="py-2 space-y-2 {{ request()->routeIs(['stock.in.create', 'stock.out.create', 'staff.stock.confirm-in', 'staff.stock.prepare-out']) ? '' : 'hidden' }}">
-                    {{-- Link untuk Manajer --}}
                     @role('manager')
                         <li><a href="{{ route('stock.in.create') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang Masuk</a></li>
                         <li><a href="{{ route('stock.out.create') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Barang Keluar</a></li>
                     @endrole
-                    {{-- Link untuk Staf --}}
                     @role('staff')
                         <li><a href="{{ route('staff.stock.confirm-in') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Konfirmasi Penerimaan</a></li>
                         <li><a href="{{ route('staff.stock.prepare-out') }}" class="flex items-center w-full p-2 text-gray-900 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Siapkan Pengeluaran</a></li>
@@ -82,6 +80,17 @@
             </li>
             @endhasanyrole
             
+            {{-- 6. MENU PENGATURAN (Hanya Admin) --}}
+            @role('admin')
+            <li>
+                {{-- PERBAIKAN: Mengarahkan ke rute settings.index --}}
+                <a href="{{ route('settings.index') }}" 
+                   class="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700 group {{ request()->routeIs('settings.index') ? 'bg-gray-100 dark:bg-gray-700' : '' }}">
+                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-gear dark:text-gray-400"></i>
+                    <span class="ms-3">Pengaturan</span>
+                </a>
+            </li>
+            @endrole
         </ul>
     </div>
 </aside>
