@@ -3,168 +3,104 @@
 @section('title', 'Admin Dashboard')
 
 @section('content')
-    <div class="container mx-auto px-4 sm:px-8">
-        <div class="py-8">
-            <div>
-                <h2 class="text-2xl font-semibold leading-tight text-gray-800">Admin Dashboard</h2>
-                <p class="text-sm text-gray-600">Ringkasan data dan aktivitas terkini.</p>
-            </div>
+<div class="p-4 sm:p-5 antialiased">
+    <div class="mx-auto max-w-screen-2xl">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Admin Dashboard</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Ringkasan data dan aktivitas terkini dalam sistem.</p>
+        </div>
 
-            <div class="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Total Produk
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $productCount ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
+        {{-- Kartu Statistik --}}
+        <div class="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-4">
+            {{-- Total Produk --}}
+            <div class="p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full">
+                        <i class="fa-solid fa-box-archive w-6 h-6 text-primary-600 dark:text-primary-400"></i>
                     </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Total Supplier
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $supplierCount ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Barang Masuk Hari Ini
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $transactionInToday ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Barang Keluar Hari Ini
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $transactionOutToday ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">Total Produk</dt>
+                            <dd><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $totalProducts ?? 0 }}</div></dd>
+                        </dl>
                     </div>
                 </div>
             </div>
-            <div class="mt-8 bg-white shadow rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 mb-4">Grafik Stok Barang</h3>
+            {{-- Total Supplier --}}
+            <div class="p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
+                 <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-green-100 dark:bg-green-900/50 p-3 rounded-full">
+                        <i class="fa-solid fa-truck-fast w-6 h-6 text-green-600 dark:text-green-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">Total Supplier</dt>
+                            <dd><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $totalSuppliers ?? 0 }}</div></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+             {{-- Barang Masuk Hari Ini --}}
+            <div class="p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
+                 <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full">
+                         <i class="fa-solid fa-circle-arrow-down w-6 h-6 text-blue-600 dark:text-blue-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">Barang Masuk Hari Ini</dt>
+                            <dd><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $transactionInToday ?? 0 }}</div></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+             {{-- Barang Keluar Hari Ini --}}
+            <div class="p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
+                 <div class="flex items-center">
+                    <div class="flex-shrink-0 bg-yellow-100 dark:bg-yellow-900/50 p-3 rounded-full">
+                         <i class="fa-solid fa-circle-arrow-up w-6 h-6 text-yellow-600 dark:text-yellow-400"></i>
+                    </div>
+                    <div class="ml-5 w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">Barang Keluar Hari Ini</dt>
+                            <dd><div class="text-2xl font-bold text-gray-900 dark:text-white">{{ $transactionOutToday ?? 0 }}</div></dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {{-- Grafik Stok Barang --}}
+            <div class="lg:col-span-2 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-gray-700 dark:text-white mb-4">Grafik Stok 10 Produk Teratas</h3>
                 <div>
                     <canvas id="productStockChart"></canvas>
                 </div>
             </div>
-            <div class="mt-8 bg-white shadow rounded-lg overflow-x-auto">
-                 <h3 class="text-lg font-semibold p-5 text-gray-700">Pengguna Terbaru</h3>
-                <table class="min-w-full leading-normal">
-                    <thead>
-                        <tr>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Nama
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Email
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Role
-                            </th>
-                            <th class="px-5 py-3 border-b-2 border-gray-200 bg-gray-100 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                                Tanggal Daftar
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($latestUsers as $user)
-                        <tr>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">{{ $user->name }}</p>
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">{{ $user->email }}</p>
-                            </td>
-                             <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <span class="relative inline-block px-3 py-1 font-semibold text-green-900 leading-tight">
-                                    <span aria-hidden class="absolute inset-0 bg-green-200 opacity-50 rounded-full"></span>
-                                    <span class="relative">{{ $user->getRoleNames()->first() }}</span>
-                                </span>
-                            </td>
-                            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-                                <p class="text-gray-900 whitespace-no-wrap">
-                                    {{ $user->created_at->format('d M Y') }}
-                                </p>
-                            </td>
-                        </tr>
-                        @empty
-                        <tr>
-                           <td colspan="4" class="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                                <p class="text-gray-500">Belum ada pengguna yang terdaftar.</p>
-                            </td>
-                        </tr>
-                        @endforelse
-                    </tbody>
-                </table>
+
+            {{-- Pengguna Terbaru --}}
+            <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg">
+                <h3 class="text-lg font-semibold p-5 text-gray-700 dark:text-white border-b dark:border-gray-700">Pengguna Terbaru</h3>
+                <div class="divide-y divide-gray-200 dark:divide-gray-700">
+                    @forelse ($latestUsers as $user)
+                        <div class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
+                            </div>
+                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-300">{{ $user->getRoleNames()->first() }}</span>
+                        </div>
+                    @empty
+                        <div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                            Belum ada pengguna lain yang terdaftar.
+                        </div>
+                    @endforelse
+                </div>
             </div>
-             </div>
+        </div>
     </div>
+</div>
 @endsection
 
 @push('scripts')
@@ -176,41 +112,60 @@
         // Ambil data yang dikirim dari controller
         const productNames = @json($productNames ?? []);
         const productQuantities = @json($productQuantities ?? []);
+        const isDarkMode = document.documentElement.classList.contains('dark');
 
-        // Dapatkan elemen canvas
-        const ctx = document.getElementById('productStockChart').getContext('2d');
-        
-        // Buat grafik baru
-        const productStockChart = new Chart(ctx, {
-            type: 'bar', // Jenis grafik: batang
-            data: {
-                labels: productNames, // Label untuk sumbu X (nama produk)
-                datasets: [{
-                    label: 'Jumlah Stok',
-                    data: productQuantities, // Data untuk sumbu Y (jumlah stok)
-                    backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                    borderColor: 'rgba(59, 130, 246, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true, // Mulai sumbu Y dari angka 0
-                        ticks: {
-                            // Memastikan angka di sumbu Y adalah bilangan bulat
-                            precision: 0
+        // Opsi warna untuk mode terang dan gelap
+        const gridColor = isDarkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)';
+        const labelColor = isDarkMode ? '#9ca3af' : '#4b5563';
+
+        if (document.getElementById('productStockChart')) {
+            const ctx = document.getElementById('productStockChart').getContext('2d');
+            const productStockChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: productNames,
+                    datasets: [{
+                        label: 'Jumlah Stok',
+                        data: productQuantities,
+                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                color: labelColor // Warna label sumbu Y
+                            },
+                             grid: {
+                                color: gridColor // Warna garis grid sumbu Y
+                            }
+                        },
+                        x: {
+                             ticks: {
+                                color: labelColor // Warna label sumbu X
+                            },
+                            grid: {
+                                color: gridColor // Warna garis grid sumbu X
+                            }
+                        }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: labelColor // Warna label legenda
+                            }
                         }
                     }
-                },
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
                 }
-            }
-        });
+            });
+        }
     });
 </script>
 @endpush
+

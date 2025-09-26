@@ -71,7 +71,7 @@
             </li>
             @endrole
 
-            {{-- 5. MENU LAPORAN (Hanya Admin & Manajer) --}}
+            {{-- 5. MENU RIWAYAT TRANSAKSI (Hanya Admin & Manajer) --}}
             @hasanyrole('admin|manager')
             <li>
                 <a href="{{ route('transactions.index') }}" 

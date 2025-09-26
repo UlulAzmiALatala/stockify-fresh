@@ -10,7 +10,7 @@ use App\Http\Controllers\StockTransactionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttributeController;
-use App\Http\Controllers\StockController; // <-- Import StockController baru
+use App\Http\Controllers\StockController;
 
 /*
 |--------------------------------------------------------------------------
@@ -18,32 +18,28 @@ use App\Http\Controllers\StockController; // <-- Import StockController baru
 |--------------------------------------------------------------------------
 */
 
-// Halaman utama akan dialihkan ke halaman login
 Route::get('/', function () {
     return redirect()->route('login');
 });
 
-// Grup rute untuk semua halaman yang memerlukan login
 Route::middleware(['auth'])->group(function () {
-
-    // Rute Dashboard utama
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // --- RUTE UNTUK MASTER DATA (HANYA ADMIN) ---
-    Route::resource('products', ProductController::class);
+    // --- RUTE MASTER DATA (ADMIN) ---
     Route::resource('categories', CategoryController::class);
     Route::resource('suppliers', SupplierController::class);
-    Route::resource('users', UserController::class);
     Route::resource('attributes', AttributeController::class);
+    Route::resource('products', ProductController::class);
+    Route::resource('users', UserController::class);
 
-    // --- RUTE UNTUK TRANSAKSI (MANAJER & STAF) ---
+    // --- RUTE TRANSAKSI (MANAJER) ---
     Route::get('/transactions', [StockTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/stock/in', [StockTransactionController::class, 'createStockIn'])->name('stock.in.create');
     Route::post('/stock/in', [StockTransactionController::class, 'storeStockIn'])->name('stock.in.store');
     Route::get('/stock/out', [StockTransactionController::class, 'createStockOut'])->name('stock.out.create');
     Route::post('/stock/out', [StockTransactionController::class, 'storeStockOut'])->name('stock.out.store');
 
-    // --- RUTE UNTUK FITUR STOK (ADMIN, MANAJER, STAF) ---
+    // --- RUTE FITUR STOK ---
     // Admin
     Route::get('/stock/report', [StockController::class, 'adminStockReport'])->name('admin.stock.report');
     // Manager
@@ -53,9 +49,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stock/confirm-in', [StockController::class, 'staffConfirmIn'])->name('staff.stock.confirm-in');
     Route::get('/stock/prepare-out', [StockController::class, 'staffPrepareOut'])->name('staff.stock.prepare-out');
 
-    // --- RUTE UNTUK LAPORAN (TIDAK DIGUNAKAN LAGI, DIHANDLE DI ATAS) ---
-    // Route::get('/reports/stock-status', [ReportController::class, 'stockStatus'])->name('reports.stock_status');
-    // Route::get('/reports/transactions', [ReportController::class, 'transactionHistory'])->name('reports.transactions');
+    // ==========================================================
+    // == PERBAIKAN: Rute baru untuk aksi konfirmasi Staf ==
+    // ==========================================================
+    Route::patch('/stock/confirm-in/{transaction}', [StockController::class, 'processConfirmIn'])->name('staff.stock.confirm-in.process');
+    Route::patch('/stock/prepare-out/{transaction}', [StockController::class, 'processPrepareOut'])->name('staff.stock.prepare-out.process');
 
     // --- RUTE PROFIL PENGGUNA ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -63,5 +61,4 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// Memuat rute-rute autentikasi
 require __DIR__ . '/auth.php';

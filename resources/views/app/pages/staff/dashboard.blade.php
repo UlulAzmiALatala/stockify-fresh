@@ -3,88 +3,66 @@
 @section('title', 'Staff Dashboard')
 
 @section('content')
-    <div class="container mx-auto px-4 sm:px-8">
-        <div class="py-8">
-            <div>
-                <h2 class="text-2xl font-semibold leading-tight text-gray-800">Staff Dashboard</h2>
-                <p class="text-sm text-gray-600">Daftar tugas operasional gudang Anda.</p>
-            </div>
+<div class="p-4 sm:p-5 antialiased">
+    <div class="mx-auto max-w-screen-2xl">
+        <div>
+            <h1 class="text-2xl font-semibold text-gray-900 dark:text-white">Staff Dashboard</h1>
+            <p class="text-sm text-gray-500 dark:text-gray-400">Daftar tugas operasional gudang Anda hari ini.</p>
+        </div>
 
-            <!-- Kartu Tugas -->
-            <div class="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
+        {{-- Kartu Tugas --}}
+        <div class="grid grid-cols-1 gap-6 py-6 sm:grid-cols-2 lg:grid-cols-3">
 
-                <!-- Tugas: Konfirmasi Barang Masuk -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-blue-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 15 17 10" />
-                                    <line x1="12" y1="15" x2="12" y2="3" />
-                                </svg>
-                            </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Barang Masuk Perlu Dikonfirmasi
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $pendingConfirmationIn ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
+            {{-- Tugas: Konfirmasi Barang Masuk --}}
+            <a href="{{ route('staff.stock.confirm-in') }}" class="block p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-start justify-between">
+                    <div class="w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">
+                                Barang Masuk (Menunggu Konfirmasi)
+                            </dt>
+                            <dd>
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $pendingStockIn ?? 0 }}
+                                </div>
+                            </dd>
+                        </dl>
                     </div>
-                    <div class="bg-gray-50 px-5 py-3">
-                        <div class="text-sm">
-                            {{-- Ganti '#' dengan route yang sesuai nanti --}}
-                            <a href="#" class="font-medium text-blue-700 hover:text-blue-900">
-                                Lihat & Konfirmasi
-                            </a>
-                        </div>
+                    <div class="flex-shrink-0 bg-blue-100 dark:bg-blue-900/50 p-3 rounded-full">
+                        <i class="fa-solid fa-dolly w-6 h-6 text-blue-600 dark:text-blue-400"></i>
                     </div>
                 </div>
+                <div class="mt-4 text-sm font-medium text-primary-600 dark:text-primary-400">
+                    Lihat Tugas &rarr;
+                </div>
+            </a>
 
-                <!-- Tugas: Siapkan Barang Keluar -->
-                <div class="bg-white overflow-hidden shadow rounded-lg">
-                    <div class="p-5">
-                        <div class="flex items-center">
-                           <div class="flex-shrink-0">
-                                <svg class="h-8 w-8 text-orange-500"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round">
-                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                                    <polyline points="7 10 12 5 17 10" />
-                                    <line x1="12" y1="5" x2="12" y2="19" />
-                                </svg>
-                           </div>
-                            <div class="ml-5 w-0 flex-1">
-                                <dl>
-                                    <dt class="text-sm font-medium text-gray-500 truncate">
-                                        Barang Keluar Perlu Disiapkan
-                                    </dt>
-                                    <dd>
-                                        <div class="text-lg font-medium text-gray-900">
-                                            {{ $readyForShipmentOut ?? 0 }}
-                                        </div>
-                                    </dd>
-                                </dl>
-                            </div>
-                        </div>
+            {{-- Tugas: Siapkan Barang Keluar --}}
+            <a href="{{ route('staff.stock.prepare-out') }}" class="block p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg hover:shadow-xl transition-shadow duration-300">
+                <div class="flex items-start justify-between">
+                    <div class="w-0 flex-1">
+                        <dl>
+                            <dt class="text-sm font-medium text-gray-500 truncate dark:text-gray-400">
+                                Barang Keluar (Perlu Disiapkan)
+                            </dt>
+                            <dd>
+                                <div class="text-3xl font-bold text-gray-900 dark:text-white">
+                                    {{ $pendingStockOut ?? 0 }}
+                                </div>
+                            </dd>
+                        </dl>
                     </div>
-                     <div class="bg-gray-50 px-5 py-3">
-                        <div class="text-sm">
-                             {{-- Ganti '#' dengan route yang sesuai nanti --}}
-                            <a href="#" class="font-medium text-orange-700 hover:text-orange-900">
-                                Lihat & Siapkan
-                            </a>
-                        </div>
+                    <div class="flex-shrink-0 bg-green-100 dark:bg-green-900/50 p-3 rounded-full">
+                         <i class="fa-solid fa-truck-ramp-box w-6 h-6 text-green-600 dark:text-green-400"></i>
                     </div>
                 </div>
+                 <div class="mt-4 text-sm font-medium text-primary-600 dark:text-primary-400">
+                    Lihat Tugas &rarr;
+                </div>
+            </a>
 
-            </div>
-            <!-- End Kartu Tugas -->
         </div>
     </div>
+</div>
 @endsection
+

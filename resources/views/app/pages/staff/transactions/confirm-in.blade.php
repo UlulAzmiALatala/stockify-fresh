@@ -5,14 +5,18 @@
 @section('content')
 <div class="p-4 sm:p-5 antialiased">
     <div class="mx-auto max-w-screen-2xl">
+        {{-- Notifikasi --}}
+        @if(session('success'))
+            <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">
+                {{ session('success') }}
+            </div>
+        @endif
+        
         <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
-            {{-- Header Halaman --}}
             <div class="p-4 border-b dark:border-gray-700">
                 <h2 class="text-xl font-semibold text-gray-900 dark:text-white">Tugas: Konfirmasi Penerimaan Barang</h2>
                 <p class="text-sm text-gray-500 dark:text-gray-400">Daftar barang masuk yang perlu diperiksa dan dikonfirmasi statusnya.</p>
             </div>
-
-            {{-- Tabel Tugas --}}
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -34,11 +38,15 @@
                                 <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded dark:bg-yellow-900 dark:text-yellow-300">{{ $transaction->status }}</span>
                             </td>
                             <td class="px-4 py-3 text-center">
-                                {{-- Di aplikasi nyata, tombol ini akan memicu form POST/PATCH --}}
-                                <button type="button" class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-xs px-3 py-1.5">
-                                    <i class="fas fa-check mr-1"></i>
-                                    Konfirmasi Penerimaan
-                                </button>
+                                {{-- PERBAIKAN: Tombol diubah menjadi form --}}
+                                <form action="{{ route('staff.stock.confirm-in.process', $transaction->id) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <button type="submit" class="text-white bg-green-600 hover:bg-green-700 font-medium rounded-lg text-xs px-3 py-1.5">
+                                        <i class="fas fa-check mr-1"></i>
+                                        Konfirmasi Penerimaan
+                                    </button>
+                                </form>
                             </td>
                         </tr>
                         @empty
@@ -52,8 +60,6 @@
                     </tbody>
                 </table>
             </div>
-            
-            {{-- Paginasi --}}
              <div class="p-4 border-t dark:border-gray-700">
                 {!! $transactions->links('vendor.pagination.custom') !!}
             </div>
