@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request; // <-- 1. Pastikan ini di-import
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\StockTransaction;
@@ -15,7 +15,7 @@ class DashboardController extends Controller
     /**
      * Tampilkan dashboard berdasarkan peran pengguna yang login.
      */
-    public function index(Request $request) // <-- 2. Tambahkan Request $request di sini
+    public function index(Request $request)
     {
         $user = Auth::user();
 
@@ -30,13 +30,33 @@ class DashboardController extends Controller
             return redirect('/login')->with('error', 'Akun Anda tidak memiliki peran. Silakan hubungi administrator.');
         }
 
+        // --- Perubahan ada di dalam blok ini ---
         if ($user->hasRole('admin')) {
+            // Data untuk kartu statistik (sudah ada sebelumnya)
             $totalProducts = Product::count();
             $totalSuppliers = Supplier::count();
             $totalUsers = User::count();
             $latestUsers = User::latest()->take(5)->get();
 
-            return view('app.pages.admin.dashboard', compact('totalProducts', 'totalSuppliers', 'totalUsers', 'latestUsers'));
+            // --- START: Data baru untuk Grafik Stok Produk ---
+            // Ambil 10 produk dengan stok terbanyak untuk ditampilkan di grafik.
+            // Menggunakan 'stock' sesuai dengan kolom yang ada di logic manager Anda.
+            $productsForChart = Product::orderBy('stock', 'desc')->limit(10)->get();
+
+            // Pisahkan nama dan kuantitas produk menjadi dua array terpisah
+            $productNames = $productsForChart->pluck('name');
+            $productQuantities = $productsForChart->pluck('stock');
+            // --- END: Data baru untuk Grafik Stok Produk ---
+
+            // Kirim semua data (termasuk data grafik) ke view admin
+            return view('app.pages.admin.dashboard', compact(
+                'totalProducts',
+                'totalSuppliers',
+                'totalUsers',
+                'latestUsers',
+                'productNames',      // <-- Data nama produk untuk grafik
+                'productQuantities'  // <-- Data jumlah stok untuk grafik
+            ));
         }
 
         if ($user->hasRole('manager')) {
