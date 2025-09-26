@@ -3,6 +3,9 @@ import forms from "@tailwindcss/forms";
 
 /** @type {import('tailwindcss').Config} */
 export default {
+    // BARIS INI DITAMBAHKAN UNTUK MENGAKTIFKAN DARK MODE
+    darkMode: "class",
+
     content: [
         // Path ke semua file Blade di proyek Anda, termasuk subdirektori
         "./resources/views/**/*.blade.php",
