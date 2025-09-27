@@ -1,3 +1,22 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * =================================================================
+ * ATURAN DARK MODE FUNDAMENTAL
+ * Kode ini adalah perbaikan paling penting. Ia memaksa warna teks
+ * default untuk seluruh aplikasi agar selalu kontras di kedua mode.
+ * =================================================================
+ */
+@layer base {
+    body {
+        /* Warna teks default untuk mode terang (abu-abu gelap) */
+        @apply text-gray-800;
+    }
+
+    html.dark body {
+        /* Warna teks default untuk mode GELAP (abu-abu terang/putih) */
+        @apply text-gray-200;
+    }
+}

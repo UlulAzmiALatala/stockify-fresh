@@ -140,6 +140,4 @@
 @endsection
 
 @push('scripts')
-{{-- Pastikan Anda sudah memuat Flowbite dan dependency-nya (seperti Datepicker) --}}
-{{-- Biasanya ini sudah ada di file app.js utama Anda jika menggunakan Vite --}}
 @endpush

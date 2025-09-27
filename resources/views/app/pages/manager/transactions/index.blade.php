@@ -23,17 +23,19 @@
 <div class="p-4">
     {{-- Form Filter dan Pencarian --}}
     <div class="p-4 mb-4 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700">
-        <form action="{{ route('transactions.index') }}" method="GET">
-            <div class="grid grid-cols-1 gap-4 md:grid-cols-4">
+        {{-- PERBAIKAN: Menambahkan ID pada form agar mudah ditarget oleh JavaScript --}}
+        <form id="filter-form" action="{{ route('transactions.index') }}" method="GET">
+            {{-- PERBAIKAN: Mengubah layout grid menjadi 3 kolom --}}
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {{-- Pencarian --}}
-                <div class="md:col-span-2">
+                <div>
                     <label for="search" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Cari Produk</label>
-                    <input type="text" name="search" id="search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700" placeholder="Cari berdasarkan nama produk..." value="{{ request('search') }}">
+                    <input type="text" name="search" id="search" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500" placeholder="Cari berdasarkan nama produk" value="{{ request('search') }}">
                 </div>
                 {{-- Filter Tipe --}}
                 <div>
                     <label for="type" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Tipe Transaksi</label>
-                    <select name="type" id="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700">
+                    <select name="type" id="type" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:text-white dark:focus:border-primary-500 dark:focus:ring-primary-500">
                         <option value="">Semua Tipe</option>
                         <option value="Masuk" {{ request('type') == 'Masuk' ? 'selected' : '' }}>Masuk</option>
                         <option value="Keluar" {{ request('type') == 'Keluar' ? 'selected' : '' }}>Keluar</option>
@@ -42,13 +44,8 @@
                 {{-- Filter Tanggal --}}
                 <div>
                     <label for="date_range" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Rentang Tanggal</label>
-                    <input type="text" name="date_range" id="date_range" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700" placeholder="Pilih rentang tanggal" value="{{ request('date_range') }}">
+                    <input type="text" name="date_range" id="date_range" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-primary-500 dark:focus:ring-primary-500" placeholder="Pilih rentang tanggal" value="{{ request('date_range') }}">
                 </div>
-            </div>
-            <div class="flex justify-end mt-4">
-                <button type="submit" class="text-white bg-primary-700 hover:bg-primary-800 font-medium rounded-lg text-sm px-5 py-2.5">
-                    Terapkan Filter
-                </button>
             </div>
         </form>
     </div>
@@ -76,10 +73,10 @@
                                 @if($transaction->type === 'Masuk')
                                     <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-green-900 dark:text-green-300">Masuk</span>
                                 @else
-                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-blue-900 dark:text-blue-300">Keluar</span>
+                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-red-900 dark:text-red-300">Keluar</span>
                                 @endif
                             </td>
-                            <td class="p-4 text-sm font-semibold {{ $transaction->type === 'Masuk' ? 'text-green-500' : 'text-blue-500' }}">
+                            <td class="p-4 text-sm font-semibold {{ $transaction->type === 'Masuk' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400' }}">
                                 {{ $transaction->type === 'Masuk' ? '+' : '-' }} {{ $transaction->quantity }}
                             </td>
                             <td class="p-4 text-sm font-normal text-gray-500 dark:text-gray-400">{{ $transaction->user->name ?? 'Sistem' }}</td>
@@ -88,7 +85,7 @@
                             </td>
                         </tr>
                     @empty
-                         <tr>
+                        <tr>
                             <td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">
                                 Tidak ada riwayat transaksi yang cocok dengan filter Anda.
                             </td>
@@ -114,10 +111,24 @@
         // Inisialisasi Flatpickr pada input rentang tanggal
         flatpickr("#date_range", {
             mode: "range",
-            dateFormat: "d-m-Y",
+            dateFormat: "Y-m-d", // Menggunakan format Y-m-d untuk backend
             altInput: true,
-            altFormat: "j F Y",
+            altFormat: "j F Y", // Format yang dilihat pengguna
         });
+
+        // --- START: PERBAIKAN UNTUK FILTER OTOMATIS ---
+
+        // 1. Dapatkan referensi ke elemen form dan filter
+        const filterForm = document.getElementById('filter-form');
+        const typeSelect = document.getElementById('type');
+
+        // 2. Tambahkan "event listener" yang akan "mendengarkan" perubahan pada dropdown
+        if (typeSelect) {
+            typeSelect.addEventListener('change', function() {
+                filterForm.submit();
+            });
+        }
     });
 </script>
 @endpush
+

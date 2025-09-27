@@ -73,15 +73,15 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {{-- Grafik Stok Barang --}}
             <div class="lg:col-span-2 bg-white dark:bg-gray-800 shadow-md rounded-lg p-6">
-                <h3 class="text-lg font-semibold text-gray-700 dark:text-white mb-4">Grafik Stok 10 Produk Teratas</h3>
-                <div>
+                <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Grafik Stok 10 Produk Teratas</h3>
+                <div class="relative h-96">
                     <canvas id="productStockChart"></canvas>
                 </div>
             </div>
 
             {{-- Pengguna Terbaru --}}
             <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg">
-                <h3 class="text-lg font-semibold p-5 text-gray-700 dark:text-white border-b dark:border-gray-700">Pengguna Terbaru</h3>
+                <h3 class="text-lg font-semibold p-5 text-gray-900 dark:text-white border-b border-gray-200 dark:border-gray-700">Pengguna Terbaru</h3>
                 <div class="divide-y divide-gray-200 dark:divide-gray-700">
                     @forelse ($latestUsers as $user)
                         <div class="p-4 flex items-center justify-between hover:bg-gray-50 dark:hover:bg-gray-700/50">
@@ -108,38 +108,42 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Ambil data yang dikirim dari controller (tidak ada perubahan di sini)
+    // Pindahkan variabel chart ke scope global agar bisa diakses dan diperbarui
+    let productStockChart;
+
+    // Buat fungsi khusus untuk menggambar/memperbarui grafik. Logika di dalamnya sudah benar.
+    function renderOrUpdateChart() {
+        const canvas = document.getElementById('productStockChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
         const productNames = @json($productNames ?? []);
         const productQuantities = @json($productQuantities ?? []);
 
-        const ctx = document.getElementById('productStockChart').getContext('2d');
-        
-        // Definisikan palet warna untuk setiap potongan pie
         const pieColors = [
-            'rgba(255, 99, 132, 0.8)',  // Merah
-            'rgba(54, 162, 235, 0.8)', // Biru
-            'rgba(255, 206, 86, 0.8)', // Kuning
-            'rgba(75, 192, 192, 0.8)', // Hijau Tosca
-            'rgba(153, 102, 255, 0.8)',// Ungu
-            'rgba(255, 159, 64, 0.8)', // Oranye
-            'rgba(46, 204, 113, 0.8)', // Hijau Terang
-            'rgba(52, 152, 219, 0.8)', // Biru Langit
-            'rgba(241, 196, 15, 0.8)', // Emas
-            'rgba(231, 76, 60, 0.8)'   // Merah Bata
+            'rgba(255, 99, 132, 0.9)', 'rgba(54, 162, 235, 0.9)', 'rgba(255, 206, 86, 0.9)',
+            'rgba(75, 192, 192, 0.9)', 'rgba(153, 102, 255, 0.9)', 'rgba(255, 159, 64, 0.9)',
+            'rgba(46, 204, 113, 0.9)', 'rgba(52, 152, 219, 0.9)', 'rgba(241, 196, 15, 0.9)',
+            'rgba(231, 76, 60, 0.9)'
         ];
 
-        const productStockChart = new Chart(ctx, {
-            // 1. Mengubah tipe grafik menjadi 'pie'
+        const isDarkMode = document.documentElement.classList.contains('dark');
+        const legendTextColor = isDarkMode ? '#f9fafb' : '#374151';
+        const pieBorderColor = isDarkMode ? '#1f2937' : '#ffffff';
+
+        if (productStockChart) {
+            productStockChart.destroy();
+        }
+
+        productStockChart = new Chart(ctx, {
             type: 'pie',
             data: {
                 labels: productNames,
                 datasets: [{
                     label: 'Jumlah Stok',
                     data: productQuantities,
-                    // 2. Memberikan warna berbeda untuk setiap produk
                     backgroundColor: pieColors,
-                    borderColor: '#FFFFFF', // Garis batas putih antar potongan
+                    borderColor: pieBorderColor,
                     borderWidth: 2
                 }]
             },
@@ -148,11 +152,15 @@
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        // 3. Memindahkan posisi legend agar lebih rapi
                         position: 'right',
+                        labels: {
+                            color: legendTextColor,
+                            font: { size: 14 }
+                        }
                     },
                     tooltip: {
-                        // 4. Membuat tooltip lebih informatif dengan persentase
+                        titleColor: legendTextColor,
+                        bodyColor: legendTextColor,
                         callbacks: {
                             label: function(context) {
                                 const label = context.label || '';
@@ -166,6 +174,26 @@
                 }
             }
         });
+    }
+
+    // --- START: PERBAIKAN DENGAN MUTATION OBSERVER ---
+
+    // 1. Gambar grafik saat halaman pertama kali dimuat
+    document.addEventListener('DOMContentLoaded', renderOrUpdateChart);
+
+    // 2. Buat "penjaga" (Observer) untuk mengawasi perubahan tema
+    const themeObserver = new MutationObserver((mutationsList) => {
+        for(const mutation of mutationsList) {
+            // Kita hanya peduli jika atribut 'class' pada <html> yang berubah
+            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+                // Panggil fungsi untuk menggambar ulang grafik
+                renderOrUpdateChart();
+            }
+        }
     });
+
+    // 3. Perintahkan "penjaga" untuk mulai mengawasi elemen <html>
+    themeObserver.observe(document.documentElement, { attributes: true });
 </script>
 @endpush
+
