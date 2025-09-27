@@ -7,68 +7,66 @@ import Alpine from "alpinejs";
 window.Alpine = Alpine;
 Alpine.start();
 
-// --- START: Logika untuk Tombol Dark/Light Mode ---
+// --- START: Logika Dark Mode yang Disederhanakan dan Efektif ---
 
-// Event listener ini memastikan kode di dalamnya hanya berjalan setelah
-// seluruh halaman HTML selesai dimuat. Ini sangat penting untuk mencegah
-// error "element not found" karena skrip berjalan sebelum tombolnya ada.
-document.addEventListener("DOMContentLoaded", () => {
+/**
+ * Fungsi ini akan mencari tombol tema dan mengaktifkan semua logikanya.
+ * Ini dibungkus dalam satu fungsi agar rapi dan aman.
+ */
+const initializeThemeToggle = () => {
+    const themeToggleButton = document.getElementById("theme-toggle");
     const themeToggleDarkIcon = document.getElementById(
         "theme-toggle-dark-icon"
     );
     const themeToggleLightIcon = document.getElementById(
         "theme-toggle-light-icon"
     );
-    const themeToggleButton = document.getElementById("theme-toggle");
 
-    // 1. Pengecekan awal untuk menampilkan ikon yang benar saat halaman dimuat
-    if (
-        localStorage.getItem("color-theme") === "dark" ||
-        (!("color-theme" in localStorage) &&
-            window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-        // Jika dark mode aktif, tampilkan ikon matahari (light icon)
-        if (themeToggleLightIcon) {
-            // Cek dulu apakah ikonnya ada
+    // 1. Pengecekan Paling Penting: Jika tombol tidak ada di halaman ini,
+    //    hentikan eksekusi fungsi ini sama sekali untuk mencegah error.
+    if (!themeToggleButton || !themeToggleDarkIcon || !themeToggleLightIcon) {
+        return;
+    }
+
+    // 2. Fungsi sederhana untuk memeriksa apakah mode gelap sedang aktif
+    const isDarkMode = () => {
+        return (
+            localStorage.getItem("color-theme") === "dark" ||
+            (!("color-theme" in localStorage) &&
+                window.matchMedia("(prefers-color-scheme: dark)").matches)
+        );
+    };
+
+    // 3. Fungsi untuk memperbarui tampilan (ikon dan tema) berdasarkan kondisi saat ini
+    const updateThemeView = () => {
+        if (isDarkMode()) {
+            document.documentElement.classList.add("dark");
             themeToggleLightIcon.classList.remove("hidden");
-        }
-    } else {
-        // Jika light mode aktif, tampilkan ikon bulan (dark icon)
-        if (themeToggleDarkIcon) {
-            // Cek dulu apakah ikonnya ada
+            themeToggleDarkIcon.classList.add("hidden");
+        } else {
+            document.documentElement.classList.remove("dark");
+            themeToggleLightIcon.classList.add("hidden");
             themeToggleDarkIcon.classList.remove("hidden");
         }
-    }
+    };
 
-    // 2. Pastikan tombolnya ada di halaman ini sebelum menambahkan event listener
-    //    Ini membuat kode lebih aman dan tidak akan error di halaman lain
-    //    yang mungkin tidak memiliki tombol ini.
-    if (themeToggleButton) {
-        themeToggleButton.addEventListener("click", function () {
-            // Ganti (toggle) ikon di dalam tombol
-            if (themeToggleDarkIcon)
-                themeToggleDarkIcon.classList.toggle("hidden");
-            if (themeToggleLightIcon)
-                themeToggleLightIcon.classList.toggle("hidden");
+    // 4. Pasang "event listener" langsung ke tombol
+    themeToggleButton.addEventListener("click", () => {
+        // Tentukan tema baru dengan membalik tema saat ini
+        const newTheme = isDarkMode() ? "light" : "dark";
 
-            // Logika untuk mengubah tema dan menyimpannya di localStorage
-            if (localStorage.getItem("color-theme")) {
-                if (localStorage.getItem("color-theme") === "light") {
-                    document.documentElement.classList.add("dark");
-                    localStorage.setItem("color-theme", "dark");
-                } else {
-                    document.documentElement.classList.remove("dark");
-                    localStorage.setItem("color-theme", "light");
-                }
-            } else {
-                if (document.documentElement.classList.contains("dark")) {
-                    document.documentElement.classList.remove("dark");
-                    localStorage.setItem("color-theme", "light");
-                } else {
-                    document.documentElement.classList.add("dark");
-                    localStorage.setItem("color-theme", "dark");
-                }
-            }
-        });
-    }
-});
+        // Simpan tema baru ke localStorage
+        localStorage.setItem("color-theme", newTheme);
+
+        // Perbarui tampilan agar sesuai dengan tema baru
+        updateThemeView();
+    });
+
+    // 5. Panggil fungsi ini sekali saat halaman dimuat untuk mengatur tampilan awal
+    updateThemeView();
+};
+
+// Jalankan seluruh logika di atas HANYA setelah seluruh halaman siap
+document.addEventListener("DOMContentLoaded", initializeThemeToggle);
+
+// --- END: Logika Dark Mode ---
