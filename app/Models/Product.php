@@ -7,10 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\Traits\LogsActivity; // <-- 1. Import Trait
+use Spatie\Activitylog\LogOptions;           // <-- 2. Import LogOptions
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity; // <-- 3. Gunakan Trait
 
     protected $fillable = [
         'category_id',
@@ -25,6 +27,18 @@ class Product extends Model
         'minimum_stock',
         'attributes',
     ];
+
+    /**
+     * Konfigurasi log aktivitas untuk model Product.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // Catat perubahan pada kolom-kolom penting ini
+            ->logOnly(['name', 'sku', 'purchase_price', 'selling_price', 'stock', 'minimum_stock'])
+            ->setDescriptionForEvent(fn(string $eventName) => "Produk ini telah di-{$eventName}")
+            ->useLogName('Product');
+    }
 
     protected function casts(): array
     {

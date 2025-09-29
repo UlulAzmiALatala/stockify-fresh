@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Spatie\Activitylog\Traits\LogsActivity; // <-- 1. Import Trait
+use Spatie\Activitylog\LogOptions;           // <-- 2. Import LogOptions
 
 class StockTransaction extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity; // <-- 3. Gunakan Trait
 
     /**
      * The attributes that are mass assignable.
@@ -23,11 +25,25 @@ class StockTransaction extends Model
         'date',
         'status',
         'notes',
+        'supplier_id', // Pastikan ini ada jika Anda menambahkannya
     ];
 
     /**
+     * Konfigurasi log aktivitas untuk model StockTransaction.
+     */
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            // Hanya catat event 'created' (saat manajer membuat) dan 'updated' (saat staf konfirmasi)
+            ->logOnly(['status'])
+            // Hanya log jika kolom 'status' berubah (misal dari 'Selesai' ke 'Diterima')
+            ->logOnlyDirty()
+            ->setDescriptionForEvent(fn(string $eventName) => "Transaksi ini telah di-{$eventName}")
+            ->useLogName('StockTransaction');
+    }
+
+    /**
      * Mendefinisikan relasi "many-to-one" ke model Product.
-     * Satu transaksi stok pasti merujuk ke satu Produk.
      */
     public function product(): BelongsTo
     {
@@ -36,10 +52,17 @@ class StockTransaction extends Model
 
     /**
      * Mendefinisikan relasi "many-to-one" ke model User.
-     * Satu transaksi stok pasti dicatat oleh satu User.
      */
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Mendefinisikan relasi "many-to-one" ke model Supplier.
+     */
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }
