@@ -15,20 +15,19 @@
                 <span class="font-medium">Sukses!</span> {{ session('success') }}
             </div>
         @endif
-         @if(session('error'))
+        @if(session('error'))
             <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">
                 <span class="font-medium">Gagal!</span> {{ session('error') }}
             </div>
         @endif
 
         {{-- Komponen Kartu Utama --}}
-        {{-- CATATAN: overflow-hidden dihapus dari sini agar dropdown aksi tidak terpotong --}}
         <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
 
             {{-- Header Kartu: Judul, Cari, dan Tombol Tambah --}}
             <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4 border-b dark:border-gray-700">
                 <div class="w-full md:w-1/2">
-                     <h5 class="text-lg font-semibold text-gray-900 dark:text-white">
+                    <h5 class="text-lg font-semibold text-gray-900 dark:text-white">
                         Daftar Kategori
                         <span class="text-gray-500">({{ $categories->total() }})</span>
                     </h5>
@@ -73,34 +72,38 @@
                                 <td class="px-4 py-3 font-semibold">{{ $category->name }}</td>
                                 <td class="px-4 py-3">{{ Str::limit($category->description, 50, '...') ?: '-' }}</td>
                                 <td class="px-4 py-3">{{ $category->products_count }}</td>
-                                <td class="px-4 py-3 text-center">
-                                    {{-- Tombol Aksi Dropdown --}}
-                                    <button id="category-options-{{ $category->id }}" data-dropdown-toggle="dropdown-{{ $category->id }}" class="inline-flex items-center text-gray-500 hover:text-gray-800 dark:hover:text-white focus:ring-4 focus:outline-none focus:ring-gray-100 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" type="button">
-                                        <i class="fas fa-ellipsis-v"></i>
-                                    </button>
-                                    <div id="dropdown-{{ $category->id }}" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="category-options-{{ $category->id }}">
-                                            <li>
-                                                <a href="{{ route('categories.show', $category->id) }}" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                    <i class="fas fa-eye mr-2"></i>Lihat Detail
-                                                </a>
-                                            </li>
-                                            <li>
-                                                <button data-modal-target="edit-category-modal-{{ $category->id }}" data-modal-toggle="edit-category-modal-{{ $category->id }}" class="w-full text-left block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                    <i class="fas fa-edit mr-2"></i>Edit
-                                                </button>
-                                            </li>
-                                            <li>
-                                                <button data-modal-target="delete-category-modal-{{ $category->id }}" data-modal-toggle="delete-category-modal-{{ $category->id }}" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500 dark:hover:text-white">
-                                                     <i class="fas fa-trash mr-2"></i>Hapus
-                                                </button>
-                                            </li>
-                                        </ul>
+                                <td class="px-4 py-3">
+                                    {{-- ======================== BAGIAN AKSI YANG DISERAGAMKAN ======================== --}}
+                                    <div class="flex items-center justify-center space-x-4">
+                                        {{-- Tombol Edit --}}
+                                        <button type="button"
+                                                data-modal-target="edit-category-modal-{{ $category->id }}"
+                                                data-modal-toggle="edit-category-modal-{{ $category->id }}"
+                                                class="text-amber-500 hover:text-amber-600"
+                                                title="Edit">
+                                            <!-- Heroicon Pencil Square -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path d="M17.414 2.586a2 2 0 0 0-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 0 0 0-2.828Z" />
+                                                <path fill-rule="evenodd" d="M2 6a2 2 0 0 1 2-2h5a1 1 0 1 1 0 2H4v10h10v-5a1 1 0 1 1 2 0v5a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
+                                        {{-- Tombol Hapus --}}
+                                        <button type="button"
+                                                data-modal-target="delete-category-modal-{{ $category->id }}"
+                                                data-modal-toggle="delete-category-modal-{{ $category->id }}"
+                                                class="text-red-600 hover:text-red-700"
+                                                title="Hapus">
+                                            <!-- Heroicon Trash -->
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M9 2a1 1 0 0 0-.894.553L7.382 4H4a1 1 0 0 0 0 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V6a1 1 0 0 0 0-2h-3.382l-.724-1.447A1 1 0 0 0 11 2H9ZM7 8a1 1 0 0 1 2 0v6a1 1 0 1 1-2 0V8Zm5-1a1 1 0 0 0-1 1v6a1 1 0 1 0 2 0V8a1 1 0 0 0-1-1Z" clip-rule="evenodd" />
+                                            </svg>
+                                        </button>
                                     </div>
+                                    {{-- ======================== AKHIR BAGIAN AKSI ======================== --}}
                                 </td>
                             </tr>
                         @empty
-                             <tr>
+                            <tr>
                                 <td colspan="5" class="py-8 px-4 text-center">
                                     <svg class="mx-auto mb-4 w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
                                       <path stroke-linecap="round" stroke-linejoin="round" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M5 8h14M5 11h14M5 14h14M5 17h14M5 20h14" />
@@ -115,7 +118,6 @@
             </div>
 
             {{-- Paginasi --}}
-            {{-- CATATAN: Navigasi disederhanakan untuk memperbaiki tumpang tindih --}}
             <div class="p-4 border-t dark:border-gray-700">
                 {!! $categories->appends(request()->query())->links() !!}
             </div>
