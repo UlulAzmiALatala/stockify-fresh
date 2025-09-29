@@ -31,7 +31,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('suppliers', SupplierController::class);
     Route::resource('attributes', AttributeController::class);
     Route::resource('products', ProductController::class);
-    Route::resource('users', UserController::class);
+    Route::resource('users', UserController::class); // route lama tetap
+
+    // tambahan: duplikasi users dengan prefix admin
+    Route::prefix('admin')->name('admin.')->group(function () {
+        Route::resource('users', UserController::class);
+    });
 
     // --- RUTE TRANSAKSI (MANAJER) ---
     Route::get('/transactions', [StockTransactionController::class, 'index'])->name('transactions.index');
@@ -55,7 +60,6 @@ Route::middleware(['auth'])->group(function () {
     // ==========================================================
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
-
 
     // --- RUTE PROFIL PENGGUNA ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
