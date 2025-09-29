@@ -16,7 +16,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        // Eager load relasi roles untuk efisiensi
         $query = User::with('roles');
 
         if ($request->filled('search')) {
@@ -29,17 +28,22 @@ class UserController extends Controller
 
         $users = $query->latest()->paginate(10);
 
-        // PENYESUAIAN: Path view diubah ke folder admin
-        return view('app.pages.admin.users.index', compact('users'));
+        // ==========================================================
+        // == PERBAIKAN: Ambil semua peran dan kirim ke view ==
+        // ==========================================================
+        $roles = Role::all();
+
+        return view('app.pages.admin.users.index', compact('users', 'roles'));
     }
 
     /**
      * Menampilkan formulir untuk membuat pengguna baru.
+     * Method ini tidak lagi digunakan oleh view modal, tapi bisa dibiarkan.
      */
     public function create()
     {
-        // PENYESUAIAN: Mengembalikan view untuk form tambah pengguna
-        return view('app.pages.admin.users.create');
+        $roles = Role::all();
+        return view('app.pages.admin.users.create', compact('roles'));
     }
 
     /**
@@ -51,7 +55,6 @@ class UserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            // PENYESUAIAN: Validasi role berdasarkan tabel 'roles' dari Spatie
             'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
@@ -61,11 +64,8 @@ class UserController extends Controller
                 'email' => $request->email,
                 'password' => Hash::make($request->password),
             ]);
-
-            // PENYESUAIAN: Menetapkan role menggunakan metode dari Spatie
             $user->assignRole($request->role);
         });
-
 
         return redirect()->route('users.index')
             ->with('success', 'Pengguna baru berhasil ditambahkan.');
@@ -94,8 +94,6 @@ class UserController extends Controller
             }
 
             $user->update($updateData);
-
-            // PENYESUAIAN: Sinkronisasi role menggunakan metode dari Spatie
             $user->syncRoles($request->role);
         });
 
@@ -113,7 +111,6 @@ class UserController extends Controller
                 ->with('error', 'Anda tidak dapat menghapus akun Anda sendiri.');
         }
 
-        // PENYEMPURNAAN: Hapus semua role dari user sebelum menghapus user
         $user->roles()->detach();
         $user->delete();
 
