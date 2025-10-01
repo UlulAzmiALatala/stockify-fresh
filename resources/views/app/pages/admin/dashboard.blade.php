@@ -15,8 +15,8 @@
             {{-- Total Produk --}}
             <div class="p-5 bg-white dark:bg-gray-800 overflow-hidden shadow-md rounded-lg">
                 <div class="flex items-center">
-                    <div class="flex-shrink-0 bg-primary-100 dark:bg-primary-900/50 p-3 rounded-full">
-                        <i class="fa-solid fa-box-archive w-6 h-6 text-primary-600 dark:text-primary-400"></i>
+                    <div class="flex-shrink-0 bg-indigo-100 dark:bg-indigo-900/50 p-3 rounded-full">
+                        <i class="fa-solid fa-box-archive w-6 h-6 text-indigo-600 dark:text-indigo-400"></i>
                     </div>
                     <div class="ml-5 w-0 flex-1">
                         <dl>
@@ -89,7 +89,7 @@
                                 <p class="text-sm font-semibold text-gray-900 dark:text-white">{{ $user->name }}</p>
                                 <p class="text-xs text-gray-500 dark:text-gray-400">{{ $user->email }}</p>
                             </div>
-                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-primary-100 text-primary-800 dark:bg-primary-900/50 dark:text-primary-300">{{ $user->getRoleNames()->first() }}</span>
+                            <span class="text-xs font-medium px-2 py-1 rounded-full bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">{{ $user->getRoleNames()->first() }}</span>
                         </div>
                     @empty
                         <div class="p-4 text-center text-sm text-gray-500 dark:text-gray-400">
@@ -108,41 +108,37 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-    // Pindahkan variabel chart ke scope global agar bisa diakses dan diperbarui
-    let productStockChart;
+    let productStockChart; // Pindahkan variabel chart ke scope global
 
-    // Buat fungsi khusus untuk menggambar/memperbarui grafik. Logika di dalamnya sudah benar.
+    // Fungsi untuk menggambar atau memperbarui grafik
     function renderOrUpdateChart() {
         const canvas = document.getElementById('productStockChart');
-        if (!canvas) return;
-
-        const ctx = canvas.getContext('2d');
-        const productNames = @json($productNames ?? []);
-        const productQuantities = @json($productQuantities ?? []);
-
-        const pieColors = [
-            'rgba(255, 99, 132, 0.9)', 'rgba(54, 162, 235, 0.9)', 'rgba(255, 206, 86, 0.9)',
-            'rgba(75, 192, 192, 0.9)', 'rgba(153, 102, 255, 0.9)', 'rgba(255, 159, 64, 0.9)',
-            'rgba(46, 204, 113, 0.9)', 'rgba(52, 152, 219, 0.9)', 'rgba(241, 196, 15, 0.9)',
-            'rgba(231, 76, 60, 0.9)'
-        ];
+        if (!canvas) return; // Hentikan jika canvas tidak ditemukan
 
         const isDarkMode = document.documentElement.classList.contains('dark');
         const legendTextColor = isDarkMode ? '#f9fafb' : '#374151';
         const pieBorderColor = isDarkMode ? '#1f2937' : '#ffffff';
+        
+        // Ambil data dari Blade (pastikan Controller mengirim variabel ini)
+        const productNames = @json($productNames ?? []);
+        const productQuantities = @json($productQuantities ?? []);
 
+        // Hancurkan instance chart lama jika ada, untuk menghindari error
         if (productStockChart) {
             productStockChart.destroy();
         }
 
-        productStockChart = new Chart(ctx, {
+        productStockChart = new Chart(canvas.getContext('2d'), {
             type: 'pie',
             data: {
                 labels: productNames,
                 datasets: [{
                     label: 'Jumlah Stok',
                     data: productQuantities,
-                    backgroundColor: pieColors,
+                    backgroundColor: [
+                        '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+                        '#FF9F40', '#8AC926', '#1982C4', '#6A4C93', '#F3722C'
+                    ],
                     borderColor: pieBorderColor,
                     borderWidth: 2
                 }]
@@ -153,14 +149,15 @@
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: {
-                            color: legendTextColor,
-                            font: { size: 14 }
-                        }
+                        labels: { color: legendTextColor, font: { size: 14 } }
                     },
                     tooltip: {
+                        // Secara eksplisit mengatur warna tooltip
+                        backgroundColor: isDarkMode ? 'rgba(31, 41, 55, 0.8)' : 'rgba(255, 255, 255, 0.8)',
                         titleColor: legendTextColor,
                         bodyColor: legendTextColor,
+                        borderColor: isDarkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                        borderWidth: 1,
                         callbacks: {
                             label: function(context) {
                                 const label = context.label || '';
@@ -176,24 +173,21 @@
         });
     }
 
-    // --- START: PERBAIKAN DENGAN MUTATION OBSERVER ---
+    // --- LOGIKA UTAMA ---
+    document.addEventListener('DOMContentLoaded', function() {
+        // 1. Gambar grafik saat halaman pertama kali dimuat
+        renderOrUpdateChart();
 
-    // 1. Gambar grafik saat halaman pertama kali dimuat
-    document.addEventListener('DOMContentLoaded', renderOrUpdateChart);
-
-    // 2. Buat "penjaga" (Observer) untuk mengawasi perubahan tema
-    const themeObserver = new MutationObserver((mutationsList) => {
-        for(const mutation of mutationsList) {
-            // Kita hanya peduli jika atribut 'class' pada <html> yang berubah
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                // Panggil fungsi untuk menggambar ulang grafik
-                renderOrUpdateChart();
-            }
+        // 2. Cari tombol ganti tema
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        if (themeToggleBtn) {
+            // 3. Tambahkan "pendengar" pada tombol tersebut
+            themeToggleBtn.addEventListener('click', function() {
+                // Beri jeda sedikit agar class 'dark' di <html> sempat diperbarui
+                setTimeout(renderOrUpdateChart, 50);
+            });
         }
     });
-
-    // 3. Perintahkan "penjaga" untuk mulai mengawasi elemen <html>
-    themeObserver.observe(document.documentElement, { attributes: true });
 </script>
 @endpush
 
