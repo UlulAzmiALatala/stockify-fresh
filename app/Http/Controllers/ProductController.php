@@ -23,7 +23,7 @@ class ProductController extends Controller
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhere('sku', 'like', 'searchTerm');
+                    ->orWhere('sku', 'like', $searchTerm);
             });
         }
 
@@ -68,7 +68,6 @@ class ProductController extends Controller
 
         $product = Product::create($validated);
 
-        // Jika ada atribut yang dikirim, sinkronkan
         if ($request->has('attributes')) {
             $product->attributes()->sync($request->attributes);
         }
@@ -104,11 +103,10 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        // Sinkronkan atribut
         if ($request->has('attributes')) {
             $product->attributes()->sync($request->attributes);
         } else {
-            $product->attributes()->detach(); // Hapus semua jika tidak ada yang dipilih
+            $product->attributes()->detach();
         }
 
         return redirect()->route('products.index')

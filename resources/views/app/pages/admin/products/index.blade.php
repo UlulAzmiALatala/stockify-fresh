@@ -14,8 +14,9 @@
             <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">{{ session('error') }}</div>
         @endif
 
-        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
             
+            {{-- Header: Search, Tambah, dan Aksi (Import/Export) --}}
             <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                 <div class="w-full md:w-1/2">
                     <form action="{{ route('products.index') }}" method="GET">
@@ -29,21 +30,33 @@
                     </form>
                 </div>
                 <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                    <a href="{{ route('products.create') }}" class="flex items-center justify-center text-white bg-indigo-600 hover:bg-indigo-700 font-medium rounded-lg text-sm px-4 py-2">
+                    <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700">
                         <i class="fa-solid fa-plus h-3.5 w-3.5 mr-2"></i>
                         Tambah Produk
-                    </a>
+                    </button>
                     
                     <div class="flex items-center space-x-3 w-full md:w-auto">
-                        {{-- PERBAIKAN: Mengubah warna background dan teks di mode gelap --}}
-                        <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600">
-                            <i class="fa-solid fa-file-import mr-2"></i>
-                            Import
+                        <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown" class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" type="button">
+                            <i class="fa-solid fa-ellipsis-vertical h-3.5 w-3.5 mr-2"></i> Aksi
                         </button>
-                        <a href="{{ route('products.export') }}" class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-600">
-                            <i class="fa-solid fa-file-export mr-2"></i>
-                            Export
-                        </a>
+                        <div id="actionsDropdown" class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
+                            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
+                                <li>
+                                    {{-- PERBAIKAN: Menambahkan ikon import --}}
+                                    <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" class="flex items-center w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                        <i class="fa-solid fa-file-import w-4 h-4 mr-2"></i>
+                                        Import
+                                    </button>
+                                </li>
+                            </ul>
+                            <div class="py-1">
+                                {{-- PERBAIKAN: Menambahkan ikon export --}}
+                                <a href="{{ route('products.export') }}" class="flex items-center py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                    <i class="fa-solid fa-file-export w-4 h-4 mr-2"></i>
+                                    Export
+                                </a>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -67,23 +80,21 @@
                                 <td class="px-4 py-3">{{ $product->category->name ?? 'N/A' }}</td>
                                 <td class="px-4 py-3">{{ 'Rp ' . number_format($product->selling_price, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3">{{ $product->stock }}</td>
-                                <td class="px-4 py-3 flex items-center justify-end space-x-2">
-                                    {{-- Tombol Edit dengan Ikon Pensil --}}
-                                    <button type="button" data-modal-target="edit-product-modal-{{ $product->id }}" data-modal-toggle="edit-product-modal-{{ $product->id }}" class="p-2 text-yellow-500 hover:text-yellow-600 dark:text-yellow-400 dark:hover:text-yellow-300 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z"></path><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd"></path></svg>
-                                        <span class="sr-only">Edit item</span>
+                                <td class="px-4 py-3 flex items-center justify-end space-x-3">
+                                    <button type="button" data-modal-target="edit-product-modal-{{ $product->id }}" data-modal-toggle="edit-product-modal-{{ $product->id }}" class="text-yellow-400 hover:text-yellow-600" title="Edit">
+                                        <i class="fas fa-edit w-5 h-5"></i>
                                     </button>
-
-                                    {{-- Tombol Hapus dengan Ikon Tong Sampah --}}
-                                    <button type="button" data-modal-target="delete-modal-{{ $product->id }}" data-modal-toggle="delete-modal-{{ $product->id }}" class="p-2 text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
-                                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"></path></svg>
-                                        <span class="sr-only">Delete item</span>
+                                    <button type="button" data-modal-target="delete-modal-{{ $product->id }}" data-modal-toggle="delete-modal-{{ $product->id }}" class="text-red-600 hover:text-red-800" title="Hapus">
+                                        <i class="fas fa-trash w-5 h-5"></i>
                                     </button>
-
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="5" class="text-center p-8">Tidak ada data produk.</td></tr>
+                            <tr>
+                                <td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">
+                                    Tidak ada data produk. Silakan tambahkan produk baru.
+                                </td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -91,7 +102,7 @@
             
             {{-- Paginasi --}}
             <div class="p-4 border-t dark:border-gray-700">
-                {!! $products->links('vendor.pagination.custom') !!}
+                {!! $products->appends(request()->query())->links('vendor.pagination.custom') !!}
             </div>
         </div>
     </div>
@@ -121,7 +132,7 @@
                     <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload File</label>
                     <input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600" name="file" type="file" required>
                     <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Hanya file dengan format .xlsx atau .xls</p>
-                    <a href="{{ route('products.export') }}?template=true" class="text-sm mt-2 text-primary-600 dark:text-primary-400 hover:underline">Unduh template file</a>
+                    <a href="{{ route('products.export') }}" class="text-sm mt-2 text-primary-600 dark:text-primary-400 hover:underline">Unduh data saat ini sebagai template</a>
                 </div>
                 <button type="submit" class="text-white mt-4 w-full bg-primary-700 hover:bg-primary-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center">
                     Import
@@ -130,13 +141,5 @@
         </div>
     </div>
 </div>
-
-{{-- Inisialisasi Flowbite secara manual untuk halaman ini --}}
-@push('scripts')
-<script type="module">
-    import { initFlowbite } from 'flowbite';
-    initFlowbite();
-</script>
-@endpush
 @endsection
 
