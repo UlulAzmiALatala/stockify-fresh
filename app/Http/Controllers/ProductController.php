@@ -23,16 +23,18 @@ class ProductController extends Controller
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhere('sku', 'like', $searchTerm);
+                    ->orWhere('sku', 'like', 'searchTerm');
             });
         }
 
         $products = $query->latest()->paginate(10);
 
         if (Auth::user()->hasRole('admin')) {
+            // PERBAIKAN: Kirim semua data yang dibutuhkan oleh modal ke halaman index
             $categories = Category::orderBy('name')->get();
             $suppliers = Supplier::orderBy('name')->get();
-            return view('app.pages.admin.products.index', compact('products', 'categories', 'suppliers'));
+            $attributes = Attribute::orderBy('name')->get();
+            return view('app.pages.admin.products.index', compact('products', 'categories', 'suppliers', 'attributes'));
         }
 
         if (Auth::user()->hasRole('manager')) {
@@ -40,34 +42,6 @@ class ProductController extends Controller
         }
 
         return abort(403, 'Akses Ditolak');
-    }
-
-    /**
-     * PERBAIKAN: Menambahkan method show untuk menampilkan detail produk.
-     */
-    public function show(Product $product)
-    {
-        // Eager load relasi untuk ditampilkan di halaman detail
-        $product->load(['category', 'supplier']);
-
-        // Hanya manajer (atau admin) yang bisa melihat halaman ini
-        if (Auth::user()->hasRole(['manager', 'admin'])) {
-            return view('app.pages.manager.products.show', compact('product'));
-        }
-
-        return abort(403, 'Anda tidak memiliki izin untuk melihat halaman ini.');
-    }
-
-    /**
-     * Menampilkan form untuk membuat produk baru.
-     */
-    public function create()
-    {
-        $categories = Category::orderBy('name')->get();
-        $suppliers = Supplier::orderBy('name')->get();
-        $attributes = Attribute::orderBy('name')->get();
-
-        return view('app.pages.admin.products.create', compact('categories', 'suppliers', 'attributes'));
     }
 
     /**
@@ -92,26 +66,15 @@ class ProductController extends Controller
             $validated['image'] = $path;
         }
 
-        Product::create($validated);
+        $product = Product::create($validated);
+
+        // Jika ada atribut yang dikirim, sinkronkan
+        if ($request->has('attributes')) {
+            $product->attributes()->sync($request->attributes);
+        }
 
         return redirect()->route('products.index')
             ->with('success', 'Produk baru berhasil ditambahkan.');
-    }
-
-
-    /**
-     * Menampilkan form untuk mengedit data produk.
-     */
-    public function edit(Product $product)
-    {
-        $categories = Category::orderBy('name')->get();
-        $suppliers = Supplier::orderBy('name')->get();
-        $attributes = Attribute::orderBy('name')->get();
-
-        $product->load('attributes');
-        $productAttributes = $product->attributes->pluck('id')->toArray();
-
-        return view('app.pages.admin.products.edit', compact('product', 'categories', 'suppliers', 'attributes', 'productAttributes'));
     }
 
     /**
@@ -141,6 +104,13 @@ class ProductController extends Controller
 
         $product->update($validated);
 
+        // Sinkronkan atribut
+        if ($request->has('attributes')) {
+            $product->attributes()->sync($request->attributes);
+        } else {
+            $product->attributes()->detach(); // Hapus semua jika tidak ada yang dipilih
+        }
+
         return redirect()->route('products.index')
             ->with('success', 'Data produk berhasil diperbarui.');
     }
@@ -164,5 +134,33 @@ class ProductController extends Controller
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
+    }
+
+    /**
+     * Method untuk menampilkan detail produk (digunakan oleh Manajer).
+     */
+    public function show(Product $product)
+    {
+        $product->load(['category', 'supplier']);
+        if (Auth::user()->hasRole(['manager', 'admin'])) {
+            return view('app.pages.manager.products.show', compact('product'));
+        }
+        return abort(403, 'Anda tidak memiliki izin untuk melihat halaman ini.');
+    }
+
+    /**
+     * PERBAIKAN: Method ini tidak lagi menampilkan halaman, jadi kita nonaktifkan.
+     */
+    public function create()
+    {
+        abort(404);
+    }
+
+    /**
+     * PERBAIKAN: Method ini tidak lagi menampilkan halaman, jadi kita nonaktifkan.
+     */
+    public function edit(Product $product)
+    {
+        abort(404);
     }
 }

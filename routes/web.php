@@ -7,12 +7,12 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\StockTransactionController;
-use App\Http\Controllers\ReportController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AttributeController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\SettingsController;
-use App\Http\Controllers\ActivityLogController; // <-- 1. Import Controller Baru
+use App\Http\Controllers\ActivityLogController;
+use App\Http\Controllers\ProductImportExportController; // <-- 1. Import controller baru
 
 /*
 |--------------------------------------------------------------------------
@@ -34,6 +34,13 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('users', UserController::class);
 
+    // ==========================================================
+    // == PERBAIKAN: Menambahkan rute untuk Import & Export Produk ==
+    // ==========================================================
+    Route::get('products-export', [ProductImportExportController::class, 'export'])->name('products.export');
+    Route::post('products-import', [ProductImportExportController::class, 'import'])->name('products.import');
+
+
     // --- RUTE TRANSAKSI (MANAJER) ---
     Route::get('/transactions', [StockTransactionController::class, 'index'])->name('transactions.index');
     Route::get('/stock/in', [StockTransactionController::class, 'createStockIn'])->name('stock.in.create');
@@ -54,6 +61,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::patch('/settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::get('/reports/activity-log', [ActivityLogController::class, 'index'])->name('admin.reports.activity-log');
+
 
     // --- RUTE PROFIL PENGGUNA ---
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
