@@ -35,28 +35,23 @@
                         Tambah Produk
                     </button>
                     
+                    {{-- Aksi Import & Export pakai Font Awesome --}}
                     <div class="flex items-center space-x-3 w-full md:w-auto">
-                        <button id="actionsDropdownButton" data-dropdown-toggle="actionsDropdown" class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700" type="button">
-                            <i class="fa-solid fa-ellipsis-vertical h-3.5 w-3.5 mr-2"></i> Aksi
+                        {{-- Tombol Import --}}
+                        <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" 
+                            class="flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            {{-- Font Awesome Import --}}
+                            <i class="fa-solid fa-file-import w-5 h-5 mr-2"></i>
+                            Import
                         </button>
-                        <div id="actionsDropdown" class="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700">
-                            <ul class="py-1 text-sm text-gray-700 dark:text-gray-200">
-                                <li>
-                                    {{-- PERBAIKAN: Menambahkan ikon import --}}
-                                    <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" class="flex items-center w-full text-left py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                        <i class="fa-solid fa-file-import w-4 h-4 mr-2"></i>
-                                        Import
-                                    </button>
-                                </li>
-                            </ul>
-                            <div class="py-1">
-                                {{-- PERBAIKAN: Menambahkan ikon export --}}
-                                <a href="{{ route('products.export') }}" class="flex items-center py-2 px-4 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
-                                    <i class="fa-solid fa-file-export w-4 h-4 mr-2"></i>
-                                    Export
-                                </a>
-                            </div>
-                        </div>
+
+                        {{-- Tombol Export --}}
+                        <a href="{{ route('products.export') }}" 
+                            class="flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            {{-- Font Awesome Export --}}
+                            <i class="fa-solid fa-file-export w-5 h-5 mr-2"></i>
+                            Export
+                        </a>
                     </div>
                 </div>
             </div>
@@ -142,4 +137,3 @@
     </div>
 </div>
 @endsection
-

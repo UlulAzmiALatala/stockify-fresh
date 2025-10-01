@@ -10,7 +10,6 @@
 
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
-    
     {{-- PERBAIKAN: 'xintegrity' diubah menjadi 'integrity' --}}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
         xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A=="
@@ -36,23 +35,21 @@
     {{-- Sidebar (fixed, di luar alur utama) --}}
     @include('app.components.sidebar')
 
-    {{-- KONTEN UTAMA DENGAN PADDING UNTUK NAVBAR DAN FOOTER --}}
-    <main class="sm:ml-64 pt-16 pb-16">
-        {{-- Padding-bottom (pb-16) memberi ruang agar konten terakhir tidak tertutup footer --}}
-        @yield('content')
-    </main>
-    
-    {{-- FOOTER YANG FIXED DI BAWAH LAYAR --}}
-    <div class="fixed bottom-0 left-0 right-0 z-30 sm:ml-64">
-        {{-- Di sini kita ganti @include dengan kode footer yang sudah dimodifikasi --}}
-        <footer class="py-3 bg-white md:py-4 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
-            <div class="container mx-auto text-center">
-                <span class="text-sm text-gray-500 dark:text-gray-400">
-                    © {{ date('Y') }} <a href="#" class="hover:underline">Stockify™</a>. All Rights Reserved.
-                </span>
+    {{-- KONTEN UTAMA YANG MENGATUR STICKY FOOTER --}}
+    <main class="sm:ml-64 flex flex-col min-h-screen">
+        
+        {{-- 1. Wrapper Konten yang akan "tumbuh" --}}
+        <div class="flex-grow">
+            {{-- 2. Spacer untuk navbar yang fixed (h-16 = 4rem) --}}
+            <div class="pt-16">
+                 @yield('content')
             </div>
-        </footer>
-    </div>
+        </div>
+
+        {{-- 3. Footer akan terdorong ke bawah oleh div di atasnya --}}
+        @include('app.components.footer')
+
+    </main>
 
     {{-- Tempat untuk script tambahan dari halaman lain --}}
     @stack('scripts')
