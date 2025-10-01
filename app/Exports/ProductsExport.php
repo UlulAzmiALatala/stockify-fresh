@@ -19,35 +19,33 @@ class ProductsExport implements FromCollection, WithHeadings, WithMapping
     }
 
     /**
-     * Menentukan judul kolom di file Excel.
+     * PERBAIKAN: Mengubah judul kolom agar lebih ramah pengguna.
      */
     public function headings(): array
     {
         return [
-            'ID',
-            'Nama Produk',
-            'SKU',
-            'Kategori',
-            'Supplier',
-            'Deskripsi',
-            'Harga Beli',
-            'Harga Jual',
-            'Stok Saat Ini',
-            'Stok Minimum',
+            'nama_produk',
+            'sku',
+            'nama_kategori',
+            'nama_supplier',
+            'deskripsi',
+            'harga_beli',
+            'harga_jual',
+            'stok_saat_ini',
+            'stok_minimum',
         ];
     }
 
     /**
-     * Memetakan data produk ke setiap baris di file Excel.
+     * PERBAIKAN: Memetakan data agar menampilkan nama, bukan ID.
      */
     public function map($product): array
     {
         return [
-            $product->id,
             $product->name,
             $product->sku,
-            $product->category->name ?? 'N/A',
-            $product->supplier->name ?? 'N/A',
+            $product->category->name ?? '', // Tampilkan nama kategori
+            $product->supplier->name ?? '', // Tampilkan nama supplier
             $product->description,
             $product->purchase_price,
             $product->selling_price,
