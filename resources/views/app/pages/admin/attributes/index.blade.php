@@ -1,7 +1,5 @@
-{{-- Memberitahu Blade untuk menggunakan kerangka utama dari folder layouts --}}
 @extends('app.layouts.app')
 
-{{-- Mengatur judul spesifik untuk halaman ini --}}
 @section('title', 'Manajemen Atribut')
 
 {{-- Ini adalah bagian konten yang akan dimasukkan ke @yield('content') di layout utama --}}
@@ -57,23 +55,30 @@
                             <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $attribute->id }}</td>
                             <td class="px-4 py-3 font-semibold">{{ $attribute->name }}</td>
                             <td class="px-4 py-3 text-center">
-                                {{-- Tombol Aksi Dropdown --}}
-                                <button id="attribute-options-{{ $attribute->id }}" data-dropdown-toggle="dropdown-{{ $attribute->id }}" class="inline-flex items-center text-gray-500 hover:text-gray-800 dark:hover:text-white focus:ring-4 focus:outline-none focus:ring-gray-100 dark:focus:ring-gray-700 rounded-lg text-sm p-1.5" type="button">
-                                    <i class="fas fa-ellipsis-v"></i>
-                                </button>
-                                <div id="dropdown-{{ $attribute->id }}" class="z-10 hidden bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                                    <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="attribute-options-{{ $attribute->id }}">
-                                        <li>
-                                            <button data-modal-target="edit-attribute-modal-{{ $attribute->id }}" data-modal-toggle="edit-attribute-modal-{{ $attribute->id }}" class="w-full text-left block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">
-                                                <i class="fas fa-edit mr-2"></i>Edit
-                                            </button>
-                                        </li>
-                                        <li>
-                                            <button data-modal-target="delete-attribute-modal-{{ $attribute->id }}" data-modal-toggle="delete-attribute-modal-{{ $attribute->id }}" class="w-full text-left block px-4 py-2 text-red-600 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-red-500 dark:hover:text-white">
-                                                <i class="fas fa-trash mr-2"></i>Hapus
-                                            </button>
-                                        </li>
-                                    </ul>
+                                <div class="flex items-center justify-center space-x-3">
+                                    {{-- Tombol Edit (Outline Pensil Kuning/Jingga) --}}
+                                    <button type="button"
+                                            data-modal-target="edit-attribute-modal-{{ $attribute->id }}"
+                                            data-modal-toggle="edit-attribute-modal-{{ $attribute->id }}"
+                                            class="text-orange-400 hover:text-orange-500 dark:text-orange-300 dark:hover:text-orange-400"
+                                            title="Edit">
+                                        {{-- Icon Heroicon Pencil (Outline) --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                                        </svg>
+                                    </button>
+
+                                    {{-- KODE SVG TRASH YANG SUDAH DIPERBAIKI --}}
+                                    <button type="button"
+                                            data-modal-target="delete-attribute-modal-{{ $attribute->id }}"
+                                            data-modal-toggle="delete-attribute-modal-{{ $attribute->id }}"
+                                            class="text-red-600 hover:text-red-700 dark:text-red-500 dark:hover:text-red-400"
+                                            title="Hapus">
+                                        {{-- Icon Heroicon Trash (Outline) --}}
+                                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                                        </svg>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -81,7 +86,7 @@
                         <tr>
                             <td colspan="3" class="py-8 px-4 text-center">
                                 <svg class="mx-auto mb-4 w-12 h-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 0 1 1 1v2M5 8h14M5 11h14M5 14h14M5 17h14M5 20h14" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M7 4V2a1 1 0 0 1 1-1h8a1 1 0 011 1v2M5 8h14M5 11h14M5 14h14M5 17h14M5 20h14" />
                                 </svg>
                                 <h5 class="mb-2 text-xl font-bold text-gray-900 dark:text-white">Tidak Ada Atribut Ditemukan</h5>
                                 <p class="font-normal text-gray-500">Mulai dengan menambahkan atribut produk pertama Anda.</p>
