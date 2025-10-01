@@ -17,7 +17,8 @@ class StockTransactionController extends Controller
      */
     public function index(Request $request)
     {
-        $query = StockTransaction::with(['product', 'user'])->latest();
+        // PERBAIKAN: Eager load relasi 'supplier' untuk efisiensi
+        $query = StockTransaction::with(['product', 'user', 'supplier'])->latest();
 
         // Filter berdasarkan pencarian nama produk
         if ($request->filled('search')) {
@@ -37,7 +38,6 @@ class StockTransactionController extends Controller
             $dates = explode(' to ', $request->date_range);
             if (count($dates) > 0) {
                 $startDate = Carbon::createFromFormat('d-m-Y', $dates[0])->startOfDay();
-                // Jika hanya ada satu tanggal, gunakan tanggal itu sebagai akhir
                 $endDate = isset($dates[1]) ? Carbon::createFromFormat('d-m-Y', $dates[1])->endOfDay() : $startDate->copy()->endOfDay();
 
                 $query->whereBetween('date', [$startDate, $endDate]);
@@ -47,12 +47,7 @@ class StockTransactionController extends Controller
         $transactions = $query->paginate(15)->appends($request->query());
 
         // Cek peran untuk menampilkan view yang benar
-        if (Auth::user()->hasRole('admin')) {
-            // PERBAIKAN: Admin juga diarahkan ke view riwayat transaksi milik manajer
-            return view('app.pages.manager.transactions.index', compact('transactions'));
-        }
-
-        if (Auth::user()->hasRole('manager')) {
+        if (Auth::user()->hasRole(['admin', 'manager'])) {
             return view('app.pages.manager.transactions.index', compact('transactions'));
         }
 

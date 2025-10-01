@@ -61,6 +61,7 @@
                         <th scope="col" class="p-4">Tipe</th>
                         <th scope="col" class="p-4">Jumlah</th>
                         <th scope="col" class="p-4">Dicatat Oleh</th>
+                        <th scope="col" class="p-4">Dari Supplier</th> {{-- <-- KOLOM BARU --}}
                         <th scope="col" class="p-4">Status</th>
                     </tr>
                 </thead>
@@ -73,20 +74,22 @@
                                 @if($transaction->type === 'Masuk')
                                     <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-green-900 dark:text-green-300">Masuk</span>
                                 @else
-                                    <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-red-900 dark:text-red-300">Keluar</span>
+                                    <span class="bg-blue-100 text-blue-800 text-xs font-medium px-2.5 py-0.5 rounded-md dark:bg-blue-900 dark:text-blue-300">Keluar</span>
                                 @endif
                             </td>
-                            <td class="p-4 text-sm font-semibold {{ $transaction->type === 'Masuk' ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400' }}">
+                            <td class="p-4 text-sm font-semibold {{ $transaction->type === 'Masuk' ? 'text-green-500' : 'text-blue-500' }}">
                                 {{ $transaction->type === 'Masuk' ? '+' : '-' }} {{ $transaction->quantity }}
                             </td>
                             <td class="p-4 text-sm font-normal text-gray-500 dark:text-gray-400">{{ $transaction->user->name ?? 'Sistem' }}</td>
+                            {{-- PERBAIKAN: Menampilkan nama supplier --}}
+                            <td class="p-4 text-sm font-normal text-gray-500 dark:text-gray-400">{{ $transaction->supplier->name ?? '-' }}</td>
                             <td class="p-4 text-sm font-normal">
                                  <span class="bg-gray-100 text-gray-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-gray-300">{{ $transaction->status }}</span>
                             </td>
                         </tr>
                     @empty
-                        <tr>
-                            <td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">
+                         <tr>
+                            <td colspan="7" class="p-8 text-center text-gray-500 dark:text-gray-400">
                                 Tidak ada riwayat transaksi yang cocok dengan filter Anda.
                             </td>
                         </tr>
@@ -97,7 +100,7 @@
         
         {{-- Paginasi --}}
         <div class="p-4 border-t dark:border-gray-700">
-            {!! $transactions->links('vendor.pagination.custom') !!}
+            {!! $transactions->appends(request()->query())->links('vendor.pagination.custom') !!}
         </div>
     </div>
 </div>
