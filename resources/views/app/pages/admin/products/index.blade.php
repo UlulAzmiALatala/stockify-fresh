@@ -16,7 +16,7 @@
 
         <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
             
-            {{-- Header: Search, Tambah, dan Aksi (Import/Export) --}}
+            {{-- Header: Search, Tambah, dan Aksi --}}
             <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
                 <div class="w-full md:w-1/2">
                     <form action="{{ route('products.index') }}" method="GET">
@@ -35,20 +35,16 @@
                         Tambah Produk
                     </button>
                     
-                    {{-- Aksi Import & Export pakai Font Awesome --}}
+                    {{-- Import & Export --}}
                     <div class="flex items-center space-x-3 w-full md:w-auto">
-                        {{-- Tombol Import --}}
                         <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" 
                             class="flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                            {{-- Font Awesome Import --}}
                             <i class="fa-solid fa-file-import w-5 h-5 mr-2"></i>
                             Import
                         </button>
 
-                        {{-- Tombol Export --}}
                         <a href="{{ route('products.export') }}" 
                             class="flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                            {{-- Font Awesome Export --}}
                             <i class="fa-solid fa-file-export w-5 h-5 mr-2"></i>
                             Export
                         </a>
@@ -65,6 +61,7 @@
                             <th scope="col" class="px-4 py-3">Kategori</th>
                             <th scope="col" class="px-4 py-3">Harga Jual</th>
                             <th scope="col" class="px-4 py-3">Stok</th>
+                            <th scope="col" class="px-4 py-3">Atribut</th> {{-- Tambahan kolom --}}
                             <th scope="col" class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -75,6 +72,17 @@
                                 <td class="px-4 py-3">{{ $product->category->name ?? 'N/A' }}</td>
                                 <td class="px-4 py-3">{{ 'Rp ' . number_format($product->selling_price, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3">{{ $product->stock }}</td>
+                                <td class="px-4 py-3">
+                                    @if($product->attributes && $product->attributes->count() > 0)
+                                        @foreach($product->attributes as $attr)
+                                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
+                                                {{ $attr->name }}
+                                            </span>
+                                        @endforeach
+                                    @else
+                                        <span class="text-gray-400 text-xs">-</span>
+                                    @endif
+                                </td>
                                 <td class="px-4 py-3 flex items-center justify-end space-x-3">
                                     <button type="button" data-modal-target="edit-product-modal-{{ $product->id }}" data-modal-toggle="edit-product-modal-{{ $product->id }}" class="text-yellow-400 hover:text-yellow-600" title="Edit">
                                         <i class="fas fa-edit w-5 h-5"></i>
@@ -86,7 +94,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="p-8 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="6" class="p-8 text-center text-gray-500 dark:text-gray-400">
                                     Tidak ada data produk. Silakan tambahkan produk baru.
                                 </td>
                             </tr>
@@ -103,7 +111,7 @@
     </div>
 </div>
 
-{{-- Memanggil semua modal yang dibutuhkan --}}
+{{-- Modal --}}
 @include('app.pages.admin.products.partials.add-modal')
 
 @foreach ($products as $product)
