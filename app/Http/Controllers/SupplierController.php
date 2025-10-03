@@ -42,6 +42,19 @@ class SupplierController extends Controller
         return abort(403, 'Akses Ditolak');
     }
 
+    public function show(Supplier $supplier)
+    {
+        // Eager load relasi products untuk ditampilkan di halaman detail
+        $supplier->load('products');
+
+        // Hanya manajer (atau admin) yang bisa melihat halaman ini
+        if (Auth::user()->hasRole(['manager', 'admin'])) {
+            return view('app.pages.manager.suppliers.show', compact('supplier'));
+        }
+
+        return abort(403, 'Anda tidak memiliki izin untuk melihat halaman ini.');
+    }
+
     /**
      * Menyimpan supplier baru ke dalam database.
      */

@@ -33,18 +33,21 @@
                     <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                         <tr>
                             <th scope="col" class="px-4 py-3">Nama Supplier</th>
-                            <th scope="col" class="px-4 py-3">Alamat</th>
                             <th scope="col" class="px-4 py-3">Telepon</th>
                             <th scope="col" class="px-4 py-3">Email</th>
+                            <th scope="col" class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse ($suppliers as $supplier)
                             <tr class="border-b dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-700">
                                 <td class="px-4 py-3 font-medium text-gray-900 dark:text-white">{{ $supplier->name }}</td>
-                                <td class="px-4 py-3">{{ Str::limit($supplier->address, 40, '...') ?: '-' }}</td>
                                 <td class="px-4 py-3">{{ $supplier->phone ?: '-' }}</td>
                                 <td class="px-4 py-3">{{ $supplier->email ?: '-' }}</td>
+                                {{-- PERBAIKAN: Menambahkan tombol lihat detail --}}
+                                <td class="px-4 py-3 text-right">
+                                     <a href="{{ route('suppliers.show', $supplier->id) }}" class="font-medium text-primary-600 dark:text-primary-500 hover:underline">Lihat Detail</a>
+                                </td>
                             </tr>
                         @empty
                              <tr>
