@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class SupplierController extends Controller
 {
@@ -24,11 +25,17 @@ class SupplierController extends Controller
             });
         }
 
-        // withCount('products') untuk menghitung jumlah produk terkait supplier
         $suppliers = $query->withCount('products')->latest()->paginate(10);
 
-        // PENYESUAIAN: Path view diubah ke folder admin
-        return view('app.pages.admin.suppliers.index', compact('suppliers'));
+        if (Auth::user()->hasRole('admin')) {
+            return view('app.pages.admin.suppliers.index', compact('suppliers'));
+        }
+
+        if (Auth::user()->hasRole('manager')) {
+            return view('app.pages.manager.suppliers.index', compact('suppliers'));
+        }
+
+        return abort(403, 'Akses Ditolak');
     }
 
     /**
