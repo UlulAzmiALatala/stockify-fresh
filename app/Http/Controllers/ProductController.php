@@ -12,25 +12,21 @@ use Illuminate\Support\Facades\Auth;
 
 class ProductController extends Controller
 {
-    /**
-     * Menampilkan daftar produk berdasarkan peran pengguna.
-     */
     public function index(Request $request)
     {
-        $query = Product::with(['category', 'supplier']);
+        $query = Product::with(['category', 'supplier', 'productAttributes']);
 
         if ($request->filled('search')) {
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                    ->orWhere('sku', 'like', $searchTerm);
+                    ->orWhere('sku', 'like', 'searchTerm');
             });
         }
 
         $products = $query->latest()->paginate(10);
 
         if (Auth::user()->hasRole('admin')) {
-            // PERBAIKAN: Kirim semua data yang dibutuhkan oleh modal ke halaman index
             $categories = Category::orderBy('name')->get();
             $suppliers = Supplier::orderBy('name')->get();
             $attributes = Attribute::orderBy('name')->get();
@@ -44,9 +40,6 @@ class ProductController extends Controller
         return abort(403, 'Akses Ditolak');
     }
 
-    /**
-     * Menyimpan produk baru ke dalam database.
-     */
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -59,6 +52,7 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'attributes' => 'nullable|array',
         ]);
 
         if ($request->hasFile('image')) {
@@ -68,17 +62,23 @@ class ProductController extends Controller
 
         $product = Product::create($validated);
 
-        if ($request->has('attributes')) {
-            $product->attributes()->sync($request->attributes);
+        // ==========================================================
+        // == PERBAIKAN FINAL: Ambil dari array $validated         ==
+        // ==========================================================
+        $attributesToSync = [];
+        if (!empty($validated['attributes'])) {
+            foreach ($validated['attributes'] as $id => $value) {
+                if (!is_null($value) && $value !== '') {
+                    $attributesToSync[$id] = ['value' => $value];
+                }
+            }
         }
+        $product->productAttributes()->sync($attributesToSync);
 
         return redirect()->route('products.index')
             ->with('success', 'Produk baru berhasil ditambahkan.');
     }
 
-    /**
-     * Memperbarui data produk yang sudah ada.
-     */
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
@@ -91,6 +91,7 @@ class ProductController extends Controller
             'selling_price' => 'required|numeric|min:0',
             'minimum_stock' => 'required|integer|min:0',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'attributes' => 'nullable|array',
         ]);
 
         if ($request->hasFile('image')) {
@@ -103,19 +104,23 @@ class ProductController extends Controller
 
         $product->update($validated);
 
-        if ($request->has('attributes')) {
-            $product->attributes()->sync($request->attributes);
-        } else {
-            $product->attributes()->detach();
+        // ==========================================================
+        // == PERBAIKAN FINAL: Ambil dari array $validated         ==
+        // ==========================================================
+        $attributesToSync = [];
+        if (!empty($validated['attributes'])) {
+            foreach ($validated['attributes'] as $id => $value) {
+                if (!is_null($value) && $value !== '') {
+                    $attributesToSync[$id] = ['value' => $value];
+                }
+            }
         }
+        $product->productAttributes()->sync($attributesToSync);
 
         return redirect()->route('products.index')
             ->with('success', 'Data produk berhasil diperbarui.');
     }
 
-    /**
-     * Menghapus produk dari database.
-     */
     public function destroy(Product $product)
     {
         if ($product->stockTransactions()->count() > 0) {
@@ -127,36 +132,28 @@ class ProductController extends Controller
             Storage::delete($product->image);
         }
 
-        $product->attributes()->detach();
+        $product->productAttributes()->detach();
         $product->delete();
 
         return redirect()->route('products.index')
             ->with('success', 'Produk berhasil dihapus.');
     }
 
-    /**
-     * Method untuk menampilkan detail produk (digunakan oleh Manajer).
-     */
     public function show(Product $product)
     {
-        $product->load(['category', 'supplier']);
+        $product->load(['category', 'supplier', 'productAttributes']);
+
         if (Auth::user()->hasRole(['manager', 'admin'])) {
             return view('app.pages.manager.products.show', compact('product'));
         }
         return abort(403, 'Anda tidak memiliki izin untuk melihat halaman ini.');
     }
 
-    /**
-     * PERBAIKAN: Method ini tidak lagi menampilkan halaman, jadi kita nonaktifkan.
-     */
     public function create()
     {
         abort(404);
     }
 
-    /**
-     * PERBAIKAN: Method ini tidak lagi menampilkan halaman, jadi kita nonaktifkan.
-     */
     public function edit(Product $product)
     {
         abort(404);

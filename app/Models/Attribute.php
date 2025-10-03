@@ -5,29 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Activitylog\Traits\LogsActivity; // <-- 1. Import Trait
-use Spatie\Activitylog\LogOptions;           // <-- 2. Import LogOptions
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\Activitylog\LogOptions;
 
 class Attribute extends Model
 {
-    use HasFactory, LogsActivity; // <-- 3. Gunakan Trait
+    use HasFactory, LogsActivity;
 
-    protected $fillable = ['name'];
+    protected $fillable = ['name', 'type', 'options'];
 
     /**
-     * Konfigurasi log aktivitas untuk model Attribute.
+     * Memberitahu Laravel bahwa kolom 'options' adalah array.
+     * Ini sangat penting agar kita bisa menggunakannya di view.
      */
+    protected $casts = [
+        'options' => 'array',
+    ];
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name']) // Hanya catat perubahan pada kolom 'name'
+            ->logOnly(['name', 'type', 'options'])
             ->setDescriptionForEvent(fn(string $eventName) => "Atribut ini telah di-{$eventName}")
             ->useLogName('Attribute');
     }
 
-    /**
-     * Relasi many-to-many ke model Product.
-     */
     public function products(): BelongsToMany
     {
         return $this->belongsToMany(Product::class, 'product_attributes')

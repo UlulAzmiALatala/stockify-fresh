@@ -10,11 +10,11 @@
         @if(session('success'))
             <div class="p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400" role="alert">{{ session('success') }}</div>
         @endif
-         @if(session('error'))
+        @if(session('error'))
             <div class="p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400" role="alert">{{ session('error') }}</div>
         @endif
 
-        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
             
             {{-- Header: Search, Tambah, dan Aksi --}}
             <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -30,22 +30,20 @@
                     </form>
                 </div>
                 <div class="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                    <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700">
+                    <button type="button" data-modal-target="add-product-modal" data-modal-toggle="add-product-modal" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none">
                         <i class="fa-solid fa-plus h-3.5 w-3.5 mr-2"></i>
                         Tambah Produk
                     </button>
                     
-                    {{-- Import & Export --}}
                     <div class="flex items-center space-x-3 w-full md:w-auto">
                         <button type="button" data-modal-target="import-modal" data-modal-toggle="import-modal" 
-                            class="flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                            <i class="fa-solid fa-file-import w-5 h-5 mr-2"></i>
+                            class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            <i class="fa-solid fa-file-import w-4 h-4 mr-2"></i>
                             Import
                         </button>
-
                         <a href="{{ route('products.export') }}" 
-                            class="flex items-center py-2 px-4 text-sm font-medium text-gray-900 bg-white rounded-lg border border-gray-200 hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
-                            <i class="fa-solid fa-file-export w-5 h-5 mr-2"></i>
+                            class="w-full md:w-auto flex items-center justify-center py-2 px-4 text-sm font-medium text-gray-900 focus:outline-none bg-white rounded-lg border border-gray-200 hover:bg-gray-100 hover:text-primary-700 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:text-white dark:hover:bg-gray-700">
+                            <i class="fa-solid fa-file-export w-4 h-4 mr-2"></i>
                             Export
                         </a>
                     </div>
@@ -61,7 +59,7 @@
                             <th scope="col" class="px-4 py-3">Kategori</th>
                             <th scope="col" class="px-4 py-3">Harga Jual</th>
                             <th scope="col" class="px-4 py-3">Stok</th>
-                            <th scope="col" class="px-4 py-3">Atribut</th> {{-- Tambahan kolom --}}
+                            <th scope="col" class="px-4 py-3">Atribut</th>
                             <th scope="col" class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -73,12 +71,36 @@
                                 <td class="px-4 py-3">{{ 'Rp ' . number_format($product->selling_price, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3">{{ $product->stock }}</td>
                                 <td class="px-4 py-3">
-                                    @if($product->attributes && $product->attributes->count() > 0)
-                                        @foreach($product->attributes as $attr)
-                                            <span class="inline-block bg-blue-100 text-blue-800 text-xs font-medium mr-1 px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-300">
-                                                {{ $attr->name }}
-                                            </span>
-                                        @endforeach
+                                    {{-- ============================================= --}}
+                                    {{-- == PERBAIKAN: ATRIBUT DIJADIKAN DROPDOWN == --}}
+                                    {{-- ============================================= --}}
+                                    @if($product->productAttributes->isNotEmpty())
+                                        <div x-data="{ open: false }" class="relative">
+                                            {{-- Tombol untuk membuka dropdown --}}
+                                            <button @click="open = !open" @click.away="open = false" class="inline-flex items-center text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
+                                                Lihat Atribut
+                                                <i class="fa-solid fa-chevron-down w-2.5 h-2.5 ml-1.5"></i>
+                                            </button>
+                                            
+                                            {{-- Konten Dropdown --}}
+                                            <div x-show="open" 
+                                                 x-transition:enter="transition ease-out duration-100"
+                                                 x-transition:enter-start="transform opacity-0 scale-95"
+                                                 x-transition:enter-end="transform opacity-100 scale-100"
+                                                 x-transition:leave="transition ease-in duration-75"
+                                                 x-transition:leave-start="transform opacity-100 scale-100"
+                                                 x-transition:leave-end="transform opacity-0 scale-95"
+                                                 class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10"
+                                                 style="display: none;">
+                                                <div class="py-1" role="menu" aria-orientation="vertical">
+                                                    @foreach($product->productAttributes as $attr)
+                                                        <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200" role="menuitem">
+                                                            <span class="font-bold">{{ $attr->name }}:</span> {{ $attr->pivot->value }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
                                     @else
                                         <span class="text-gray-400 text-xs">-</span>
                                     @endif
@@ -111,7 +133,7 @@
     </div>
 </div>
 
-{{-- Modal --}}
+{{-- Modal Add, Edit, Delete --}}
 @include('app.pages.admin.products.partials.add-modal')
 
 @foreach ($products as $product)
@@ -144,4 +166,5 @@
         </div>
     </div>
 </div>
+
 @endsection
