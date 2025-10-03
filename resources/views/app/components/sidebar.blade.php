@@ -12,7 +12,7 @@
             <li>
                 <a href="{{ route('dashboard') }}" 
                    class="flex items-center p-2 rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('dashboard') ? $activeClass : $inactiveClass }}">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-chart-pie dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ request()->routeIs('dashboard') ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ request()->routeIs('dashboard') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-chart-pie transition duration-200 ease-in-out"></i>
                     <span class="ms-3">Dashboard</span>
                 </a>
             </li>
@@ -20,41 +20,48 @@
             {{-- 2. MENU MANAJEMEN PRODUK (Bisa diakses Admin & Manager) --}}
             @hasanyrole('admin|manager')
             @php
-                $isProductMenuActive = request()->routeIs(['products.*', 'categories.*', 'suppliers.*', 'attributes.*']);
+            $isProductMenuActive = request()->routeIs(['products.*', 'categories.*', 'suppliers.*', 'attributes.*']);
             @endphp
             <li>
                 <button type="button" class="flex items-center w-full p-2 text-base rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ $inactiveClass }} {{ $isProductMenuActive ? 'text-primary-600 dark:text-primary-400' : '' }}" aria-controls="dropdown-products" data-collapse-toggle="dropdown-products">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-box-archive dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ $isProductMenuActive ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ $isProductMenuActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-box-archive transition duration-200 ease-in-out"></i>
                     <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Manajemen Produk</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
                 <ul id="dropdown-products" class="py-2 space-y-2 {{ $isProductMenuActive ? '' : 'hidden' }}">
-                    {{-- 'Daftar Produk' bisa dilihat oleh admin & manager --}}
-                    <li><a href="{{ route('products.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('products.*') ? $activeClass : $inactiveClass }}">Daftar Produk</a></li>
+                    <li>
+                        <a href="{{ route('products.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('products.*') ? $activeClass : $inactiveClass }}">Daftar Produk</a>
+                    </li>
                     
-                    {{-- Hanya 'admin' yang bisa melihat Kategori --}}
                     @role('admin')
-                    <li><a href="{{ route('categories.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('categories.*') ? $activeClass : $inactiveClass }}">Kategori</a></li>
+                    <li>
+                        <a href="{{ route('categories.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('categories.*') ? $activeClass : $inactiveClass }}">Kategori</a>
+                    </li>
                     @endrole
 
-                    {{-- 'Supplier' bisa dilihat oleh admin & manager --}}
-                    <li><a href="{{ route('suppliers.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('suppliers.*') ? $activeClass : $inactiveClass }}">Supplier</a></li>
+                    <li>
+                        <a href="{{ route('suppliers.index') }}" 
+                           class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('suppliers.*') ? $activeClass : $inactiveClass }}">
+                           Supplier
+                        </a>
+                    </li>
                     
-                    {{-- Hanya 'admin' yang bisa melihat Atribut --}}
                     @role('admin')
-                    <li><a href="{{ route('attributes.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('attributes.*') ? $activeClass : $inactiveClass }}">Atribut</a></li>
+                    <li>
+                        <a href="{{ route('attributes.index') }}" class="flex items-center w-full p-2 rounded-lg pl-11 group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('attributes.*') ? $activeClass : $inactiveClass }}">Atribut</a>
+                    </li>
                     @endrole
                 </ul>
             </li>
             @endhasanyrole
             
-            {{-- 3. MENU MANAJEMEN STOK (Semua Role, Tampilan Berbeda) --}}
+            {{-- 3. MENU MANAJEMEN STOK (Tampilan berbeda untuk tiap role) --}}
             @php
                 $isStockMenuActive = request()->routeIs(['stock.in.create', 'stock.out.create', 'manager.stock.opname', 'staff.stock.confirm-in', 'staff.stock.prepare-out', 'admin.stock.report']);
             @endphp
-              <li>
+            <li>
                 <button type="button" class="flex items-center w-full p-2 text-base rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ $inactiveClass }} {{ $isStockMenuActive ? 'text-primary-600 dark:text-primary-400' : '' }}" aria-controls="dropdown-stock" data-collapse-toggle="dropdown-stock">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-boxes-stacked dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ $isStockMenuActive ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ $isStockMenuActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-boxes-stacked transition duration-200 ease-in-out"></i>
                     <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Manajemen Stok</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
@@ -74,14 +81,14 @@
                 </ul>
             </li>
 
-            {{-- 4. MENU LAPORAN --}}
+            {{-- 4. MENU LAPORAN (Bisa diakses Admin & Manager) --}}
             @hasanyrole('admin|manager')
             @php
                 $isReportActive = request()->routeIs(['transactions.index', 'admin.reports.activity-log']);
             @endphp
             <li>
                 <button type="button" class="flex items-center w-full p-2 text-base rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ $inactiveClass }} {{ $isReportActive ? 'text-primary-600 dark:text-primary-400' : '' }}" aria-controls="dropdown-reports" data-collapse-toggle="dropdown-reports">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-file-lines dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ $isReportActive ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ $isReportActive ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-file-lines transition duration-200 ease-in-out"></i>
                     <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Laporan</span>
                     <i class="fa-solid fa-chevron-down"></i>
                 </button>
@@ -94,23 +101,23 @@
             </li>
             @endhasanyrole
 
-            {{-- 5. MENU MANAJEMEN PENGGUNA --}}
+            {{-- 5. MENU MANAJEMEN PENGGUNA (Hanya Admin) --}}
             @role('admin')
             <li>
                 <a href="{{ route('users.index') }}" 
                    class="flex items-center p-2 rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('users.*') ? $activeClass : $inactiveClass }}">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-users dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ request()->routeIs('users.*') ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ request()->routeIs('users.*') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-users transition duration-200 ease-in-out"></i>
                     <span class="ms-3">Manajemen Pengguna</span>
                 </a>
             </li>
             @endrole
             
-            {{-- 6. MENU PENGATURAN --}}
+            {{-- 6. MENU PENGATURAN (Hanya Admin) --}}
             @role('admin')
             <li>
                 <a href="{{ route('settings.index') }}" 
                    class="flex items-center p-2 rounded-lg group transition duration-200 ease-in-out hover:translate-x-2 {{ request()->routeIs('settings.index') ? $activeClass : $inactiveClass }}">
-                    <i class="w-5 h-5 text-center text-gray-500 fa-solid fa-gear dark:text-gray-400 transition duration-200 ease-in-out group-hover:text-primary-600 dark:group-hover:text-primary-400 {{ request()->routeIs('settings.index') ? 'text-primary-600 dark:text-primary-400' : '' }}"></i>
+                    <i class="w-5 h-5 text-center {{ request()->routeIs('settings.index') ? 'text-primary-600 dark:text-primary-400' : 'text-gray-500 dark:text-gray-400 group-hover:text-primary-600 dark:group-hover:text-primary-400' }} fa-solid fa-gear transition duration-200 ease-in-out"></i>
                     <span class="ms-3">Pengaturan</span>
                 </a>
             </li>
@@ -118,3 +125,4 @@
         </ul>
     </div>
 </aside>
+

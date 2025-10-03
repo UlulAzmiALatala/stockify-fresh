@@ -4,18 +4,17 @@ namespace App\Http\Controllers;
 
 use App\Models\Supplier;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Auth; // <-- 1. Import Auth
 
 class SupplierController extends Controller
 {
     /**
-     * Menampilkan daftar supplier dengan paginasi dan fungsionalitas pencarian.
+     * Menampilkan daftar supplier dengan paginasi dan pencarian.
      */
     public function index(Request $request)
     {
         $query = Supplier::query();
 
-        // Logika pencarian berdasarkan nama, email, atau telepon supplier
         if ($request->filled('search')) {
             $searchTerm = '%' . $request->search . '%';
             $query->where(function ($q) use ($searchTerm) {
@@ -27,11 +26,16 @@ class SupplierController extends Controller
 
         $suppliers = $query->withCount('products')->latest()->paginate(10);
 
+        // ==========================================================
+        // == PERBAIKAN: Cek peran dan tampilkan view yang sesuai ==
+        // ==========================================================
         if (Auth::user()->hasRole('admin')) {
+            // Untuk Admin, tampilkan view CRUD lengkap
             return view('app.pages.admin.suppliers.index', compact('suppliers'));
         }
 
         if (Auth::user()->hasRole('manager')) {
+            // Untuk Manajer, tampilkan view read-only
             return view('app.pages.manager.suppliers.index', compact('suppliers'));
         }
 
@@ -43,7 +47,6 @@ class SupplierController extends Controller
      */
     public function store(Request $request)
     {
-        // Validasi input dari form
         $request->validate([
             'name' => 'required|string|max:255|unique:suppliers,name',
             'email' => 'nullable|email|max:255|unique:suppliers,email',
@@ -51,10 +54,8 @@ class SupplierController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        // Membuat data supplier baru
         Supplier::create($request->all());
 
-        // Kembali ke halaman index dengan pesan sukses
         return redirect()->route('suppliers.index')
             ->with('success', 'Supplier baru berhasil ditambahkan.');
     }
@@ -64,7 +65,6 @@ class SupplierController extends Controller
      */
     public function update(Request $request, Supplier $supplier)
     {
-        // Validasi input, mengabaikan data unik untuk supplier yang sedang diedit
         $request->validate([
             'name' => 'required|string|max:255|unique:suppliers,name,' . $supplier->id,
             'email' => 'nullable|email|max:255|unique:suppliers,email,' . $supplier->id,
@@ -72,10 +72,8 @@ class SupplierController extends Controller
             'address' => 'nullable|string',
         ]);
 
-        // Update data supplier
         $supplier->update($request->all());
 
-        // Kembali ke halaman index dengan pesan sukses
         return redirect()->route('suppliers.index')
             ->with('success', 'Data supplier berhasil diperbarui.');
     }
@@ -85,7 +83,6 @@ class SupplierController extends Controller
      */
     public function destroy(Supplier $supplier)
     {
-        // Pengecekan apakah supplier masih memiliki produk terkait
         if ($supplier->products()->count() > 0) {
             return redirect()->route('suppliers.index')
                 ->with('error', 'Gagal! Supplier masih memiliki produk terkait.');
@@ -93,7 +90,6 @@ class SupplierController extends Controller
 
         $supplier->delete();
 
-        // Kembali ke halaman index dengan pesan sukses
         return redirect()->route('suppliers.index')
             ->with('success', 'Supplier berhasil dihapus.');
     }
