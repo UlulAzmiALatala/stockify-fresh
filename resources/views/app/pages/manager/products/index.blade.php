@@ -6,7 +6,7 @@
 
 <div class="p-4 sm:p-5 antialiased">
     <div class="mx-auto max-w-screen-2xl">
-        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
+        <div class="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
             
             {{-- Header Tabel: Search dan Judul --}}
             <div class="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
@@ -17,6 +17,7 @@
                     </h5>
                 </div>
                 <div class="w-full md:w-1/2">
+                    {{-- PERBAIKAN: Mengubah nama rute agar sesuai dengan file routes/web.php Anda --}}
                     <form action="{{ route('products.index') }}" method="GET" class="flex items-center">
                         <label for="simple-search" class="sr-only">Cari</label>
                         <div class="relative w-full">
@@ -38,6 +39,8 @@
                             <th scope="col" class="px-4 py-3">Kategori</th>
                             <th scope="col" class="px-4 py-3">Harga Jual</th>
                             <th scope="col" class="px-4 py-3">Stok</th>
+                            <th scope="col" class="px-4 py-3">Atribut</th>
+                            {{-- PERBAIKAN: Menambahkan kembali kolom Aksi --}}
                             <th scope="col" class="px-4 py-3 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -48,13 +51,42 @@
                                 <td class="px-4 py-3">{{ $product->category->name ?? 'N/A' }}</td>
                                 <td class="px-4 py-3">{{ 'Rp ' . number_format($product->selling_price, 0, ',', '.') }}</td>
                                 <td class="px-4 py-3">{{ $product->stock }}</td>
+                                <td class="px-4 py-3">
+                                    @if($product->productAttributes->isNotEmpty())
+                                        <div x-data="{ open: false }" class="relative">
+                                            {{-- Tombol untuk membuka dropdown --}}
+                                            <button @click="open = !open" @click.away="open = false" class="inline-flex items-center text-gray-500 bg-gray-100 dark:bg-gray-700 dark:text-gray-300 rounded-lg p-1.5 hover:bg-gray-200 dark:hover:bg-gray-600 text-sm">
+                                                Lihat Atribut
+                                                <i class="fa-solid fa-chevron-down w-2.5 h-2.5 ml-1.5"></i>
+                                            </button>
+                                            
+                                            {{-- Konten Dropdown --}}
+                                            <div x-show="open" 
+                                                 x-transition
+                                                 class="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 z-10"
+                                                 style="display: none;">
+                                                <div class="py-1" role="menu" aria-orientation="vertical">
+                                                    @foreach($product->productAttributes as $attr)
+                                                        <div class="px-4 py-2 text-sm text-gray-700 dark:text-gray-200" role="menuitem">
+                                                            <span class="font-bold">{{ $attr->name }}:</span> {{ $attr->pivot->value }}
+                                                        </div>
+                                                    @endforeach
+                                                </div>
+                                            </div>
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 text-xs">-</span>
+                                    @endif
+                                </td>
+                                {{-- PERBAIKAN: Menambahkan kembali link Lihat Detail --}}
                                 <td class="px-4 py-3 text-right">
-                                     <a href="{{ route('products.show', $product->id) }}" class="font-medium text-primary-600 dark:text-primary-500 hover:underline">Lihat Detail</a>
+                                    <a href="{{ route('products.show', $product->id) }}" class="font-medium text-indigo-600 dark:text-indigo-500 hover:underline">Lihat Detail</a>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="5" class="text-center p-8 text-gray-500 dark:text-gray-400">Tidak ada data produk.</td>
+                                {{-- PERBAIKAN: Colspan disesuaikan menjadi 6 --}}
+                                <td colspan="6" class="text-center p-8 text-gray-500 dark:text-gray-400">Tidak ada data produk.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -70,3 +102,4 @@
 </div>
 
 @endsection
+
